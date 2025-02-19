@@ -1,4 +1,4 @@
-name: CI
+name: Mobile automation test
 on:
   workflow_dispatch:
 jobs:
