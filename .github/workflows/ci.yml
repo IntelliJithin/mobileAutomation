@@ -19,6 +19,7 @@ jobs:
         - name: Install Appium and drivers
           run: 
             npm install -g appium
+            npm install appium-uiautomator2-driver
             appium driver install uiautomator2
 
         - name: Fix Permissions
