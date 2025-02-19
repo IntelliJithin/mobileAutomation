@@ -62,7 +62,7 @@ export const config = {
         'appium:platformVersion': '15.0',
         'appium:deviceName': 'Pixel 9',
         'appium:automationName': 'UiAutomator2',
-        'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk')
+        'appium:app': 'app/android/ApiDemos-debug.apk'
     }],
 
     //
