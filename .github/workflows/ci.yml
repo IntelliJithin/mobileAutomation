@@ -46,6 +46,7 @@ jobs:
             # Set environment variables
             echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
             echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+            echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH" >> $GITHUB_ENV
  
             # Reload the environment variables
             source $GITHUB_ENV
@@ -57,10 +58,9 @@ jobs:
         - name: Set up Android Emulator
           run: |
             # Create new Android Virtual Device (AVD)
-            echo no | advmanager create avd --name test_avd --package "system-images;android-29;google_apis;x86_64" --device "pixel" --force
-            emulator -avd test_avd -no-window & # Start the emulator
-            adb devices # Check if the emulator is connected
-            sleep 30 # Give time for emulator to start up
+            echo no | advmanager create avd --n test_emulator -k "system-images;android-29;google_apis;x86_64" --device "pixel"
+            nohup emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect &
+            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep ; done;'
 
         - name: List installed Appium drivers
           run: appium driver list --installed
