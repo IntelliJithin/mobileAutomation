@@ -12,6 +12,6 @@
     "appium-xcuitest-driver": "^8.3.1"
   },
   "scripts": {
-    "test:local": "wdio wdio.conf.js"
+    "test:local": "npx wdio wdio.conf.js"
   }
 }
