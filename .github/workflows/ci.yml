@@ -13,6 +13,12 @@ jobs:
           with:
             node-version: 18
 
+        - name: Clean node_modules and package-lock.json
+          run:
+            rm -rf node_modules
+            rm package-lock.json
+            npm install # Reinstall dependencies cleanly
+
         - name: 🏗️ Install Dependencies
           run: npm install
 
@@ -21,6 +27,9 @@ jobs:
             npm install -g appium
             npm install appium-uiautomator2-driver
             appium driver install uiautomator2
+
+        - name: List installed Appium drivers
+          run: appium driver list --installed
 
         - name: Fix Permissions
           run: chmod +x node_modules/.bin/wdio
