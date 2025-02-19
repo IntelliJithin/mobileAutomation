@@ -16,8 +16,8 @@ jobs:
         - name: 🏗️ Install Dependencies
           run: npm install
 
-        - name: 🧪 Test
-          run: npm run test:local
+        - name: 🧪 Run WebdriverIO Tests
+          run: npx wdio wdio.conf.js
 
         - name: 📦 Upload Logs
           uses: actions/upload-artifact@v4
