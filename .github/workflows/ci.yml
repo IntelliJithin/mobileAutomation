@@ -28,7 +28,7 @@ jobs:
       - name: Install Appium and drivers
         run: |
           echo "Checking currently installed Appium driver..."
-          INSTALLED_DRIVERS=$(appium driver --installed 2>&1)
+          INSTALLED_DRIVERS=$(appium driver list --installed 2>&1)
           echo "$INSTALLED_DRIVERS"
 
           if echo "$INSTALLED_DRIVERS" | grep -q "uiautomator2"; then
