@@ -28,6 +28,24 @@ jobs:
             npm install appium-uiautomator2-driver
             appium driver install uiautomator2
 
+        - name: Set up Java
+          run: sudo apt-get install openjdk-11-jdk
+
+        - name: Install Android SDK
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y android-sdk
+            export ANDROID_HOME=/usr/lib/android-sdk
+            export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
+
+        - name: Set up Android Emulator
+          run: |
+            echo no | android update sdk --no-ui --filter "tools, platform-tools, build-tools, android-29"
+            echo no | android create avd --name test_avd --target android 29 --abi armeabi-v7a --device 1
+            emulator -avd test_avd -no-window & # Start the emulator
+            adb devices # Check if the emulator is connected
+            sleep 30 # Give time for emulator to start up
+
         - name: List installed Appium drivers
           run: appium driver list --installed
 
