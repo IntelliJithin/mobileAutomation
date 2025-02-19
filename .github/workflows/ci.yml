@@ -27,13 +27,21 @@ jobs:
  
       - name: Install Appium and drivers
         run: |
+          echo "Removing Appium and all installed drivers..."
+          npm uninstall -g appium || true
+          rm -rf ~/.appium || true
+          rm -rf ~/.npm/_npx || true
+
+          echo "Installing Appium..."
           npm install -g appium
-          npm install appium-uiautomator2-driver
+
+          echo "Checking if uiautomator2 driver is installed..."
           if appium driver list --installed | grep -q "uiautomator2"; then
-           echo "Removing existing uiautomator2 driver..."
-           appium driver uninstall uiautomator2
-          fi 
-          echo "Installing uiautomator2 driver..."
+           echo "Forcing removal of existing uiautomator2 driver..."
+           appium driver uninstall uiautomator2 || true
+          fi
+
+          echo "Installing fresh uiautomator2 driver..."
           appium driver install uiautomator2
            
       - name: Install Java
