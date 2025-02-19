@@ -28,24 +28,20 @@ jobs:
       - name: Install Appium and drivers
         run: |
           echo "Checking currently installed Appium driver..."
-          INSTALLED_DRIVERS=$(appium driver list --installed 2>&1)
-          echo "$INSTALLED_DRIVERS"
+          if ! command -v appium &> /dev/null; then
+           echo "Appium not found. Installing..."
+           npm install -g appium
+          fi
+          
+          INSTALLED_DRIVERS=$(appium driver list --installed 2>&1 || echo "Error: Appium command failed")
 
           if echo "$INSTALLED_DRIVERS" | grep -q "uiautomator2"; then
-           echo "uiautomator2 is already installed. Skipping removal and reinstallation."
+           echo "uiautomator2 is already installed. Skipping reinstallation."
           else
            echo "uiautomator2 not found. Reinstalling Appium and drivers..."
-
-           npm uninstall -g appium || true
-           rm -rf ~/.appium || true
-           npm install -g appium
-
            appium driver install uiautomator2
           fi
-
-          echo "Final list of installed appium drivers:"
-          appium driver list --installed
-           
+                    
       - name: Install Java
         run: sudo apt-get install -y openjdk-11-jdk
  
