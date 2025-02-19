@@ -47,29 +47,41 @@ jobs:
  
       - name: Install Android SDK and Setup Path
         run: |
-          echo "Installing Android SDK & dependencies..."
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
+           echo "📥 Installing Android SDK & dependencies..."
+           sudo apt-get update
+           sudo apt-get install -y wget unzip
  
-          echo "Download and extract Android command-line tools..."
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          unzip -q commandlinetools-linux-8092744_latest.zip -d $HOME/android-sdk/cmdline-tools
-          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+           echo "📥 Downloading Android command-line tools..."
+           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
  
-          echo "Set environment variables..."
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH" >> $GITHUB_ENV
+           echo "📂 Extracting Android command-line tools..."
+           mkdir -p $HOME/android-sdk/cmdline-tools
+           unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
+           mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
  
-          echo "Accepting licenses..."
-          yes |sdkmanager --licenses || echo "License acceptance failed"
-
-          echo "Installing required SDK packages..."
-          sdkmanager --install "platform-tools" "build-tools;30.0.3" "platoforms;android-29" "System-images;android-29;google_apis;x86_64"
-
-          echo "Listing installed SDK components..."
-          sdkmanager --list
+           echo "🔧 Setting environment variables..."
+           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+           echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH" >> $GITHUB_ENV
+ 
+           # Reload the environment variables
+           source $GITHUB_ENV
+ 
+           echo "📌 Verifying sdkmanager existence..."
+           if [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            echo "✅ sdkmanager found!"
+           else
+            echo "❌ ERROR: sdkmanager not found!"
+            exit 1
+           fi
+ 
+           echo "✅ Accepting licenses..."
+           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || echo "⚠️ License acceptance failed"
+ 
+           echo "📥 Installing required SDK packages..."
+           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "build-tools;30.0.3" "platforms;android-29" "system-images;android-29;google_apis;x86_64"
+ 
+           echo "📌 Listing installed SDK components..."
+           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list
 
       - name: Verify SDK Installation
         run: |
