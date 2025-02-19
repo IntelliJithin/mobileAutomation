@@ -29,8 +29,14 @@ jobs:
         run: |
           npm install -g appium
           npm install appium-uiautomator2-driver
-          appium driver install uiautomator2
- 
+          if appium driver list --installed | grep -q "uiautomator2"; then
+           echo "uiautomator2 is already installed, updating..."
+           appium driver update uiautomator2
+          else
+           echo "Installing uiautomator2 driver..."
+           appium driver install uiautomator2
+          fi 
+           
       - name: Install Java
         run: sudo apt-get install -y openjdk-11-jdk
  
