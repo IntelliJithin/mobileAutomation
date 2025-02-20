@@ -119,12 +119,14 @@ jobs:
           timeout 120 sh -c '
            while true; do
             if adb devices | grep -m 1 "emulator-" > /dev/null; then
-            break
-           fi
-           if [$(date +%s) -ge $(($START_TIME + 120))]; then 
-            echo 'Emulator did not start in time...'; 
-            exit 1
-           fi
+             break
+            fi
+           
+            if [$(date +%s) -ge $(($START_TIME + 120))]; then 
+             echo 'Emulator did not start in time...'; 
+             exit 1
+            fi
+           
             echo "Still waiting for emulator to start..."
             sleep 5; 
            done
