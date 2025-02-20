@@ -114,9 +114,9 @@ jobs:
           nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot > emulator.log 2>&1 &
 
           echo "⏳ Waiting for emulator to start..."
-          START_TIME=$(date +%s)
-          
+                    
           timeout 120 bash -c "
+           START_TIME=$(date +%s)
            until adb devices | grep -m 1 'emulator-' || [\$(date +%s) -ge \$(($START_TIME + 120))]; do 
             echo 'Still waiting for emulator to start...'; 
             sleep 5; 
