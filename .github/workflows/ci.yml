@@ -113,6 +113,15 @@ jobs:
           echo "📢 Starting emulator..."
           nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot > emulator.log 2>&1 &
 
+          sleep 5
+
+          echo "Checking if emulator process is running..."
+          if ! ps aux ! grep -v grep | grep -q "emulator"; then
+           echo "Emulator failed to start! Check emulator.log for details."
+           cat emulator.log
+           exit 1
+          fi
+
           echo "⏳ Waiting for emulator to start..."
           START_TIME=$(date +%s)
 
