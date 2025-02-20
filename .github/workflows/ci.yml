@@ -109,10 +109,20 @@ jobs:
 
           echo "📌 Listing available AVDs..."
           $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
+
+          echo "Checking if AVD already exists"
+          &ANDROID_HOME/platform-tools/adb start-server
+
+          # Check for KVM permissions
+          if [ ! -w /dev/kvm ]; then
+           echo "KVM permissions issue detected! Running without hardware acceleration..."
+           ACCEL_FLAG="-no-accel"
+          else
+           ACCEL_FLAG="-accel on"
+          fi
  
           echo "📢 Starting emulator..."
-          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -accel off -no-snapshot > emulator.log 2>&1 &
-
+          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect $ACCEL_FLAG -no-snapshot > emulator.log 2>&1 &
           sleep 5
 
           echo "Checking if emulator process is running..."
