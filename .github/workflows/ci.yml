@@ -111,7 +111,7 @@ jobs:
           $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
 
           echo "Checking if AVD already exists"
-          &ANDROID_HOME/platform-tools/adb start-server
+          $ANDROID_HOME/platform-tools/adb start-server
 
           # Check for KVM permissions
           if [ ! -w /dev/kvm ]; then
