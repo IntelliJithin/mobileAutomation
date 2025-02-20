@@ -110,7 +110,7 @@ jobs:
           echo "📌 Listing available AVDs..."
           $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
 
-          echo "Checking if AVD already exists"
+          echo "Ensureing ADB is running..."
           $ANDROID_HOME/platform-tools/adb start-server
 
           # Check for KVM permissions
@@ -126,7 +126,7 @@ jobs:
           sleep 5
 
           echo "Checking if emulator process is running..."
-          if ! ps aux ! grep -v grep | grep -q "emulator"; then
+          if ! pgrep -f "emulator" > /dev/null; then
            echo "Emulator failed to start! Check emulator.log for details."
            cat emulator.log
            exit 1
