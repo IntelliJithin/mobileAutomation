@@ -95,7 +95,6 @@ jobs:
  
       - name: Set up Android Emulator
         run: |
-
           echo "📌 Checking if AVD already exists..."
           if $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd | grep -q "test_emulator"; then
           echo "✅ AVD already exist!"
@@ -103,6 +102,10 @@ jobs:
           echo "📌 Creating AVD..."
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-29;default;x86_64" --device "pixel"
           fi
+
+          echo "📌 Setting AVD Path..."
+          export ANDROID_AVD_HOME=$HOME/.config/.android/avd
+          echo "ANDROID_AVD_HOME=$ANDROID_AVD_HOME" >> $GITHUB_ENV
 
           echo "📌 Listing available AVDs..."
           $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
