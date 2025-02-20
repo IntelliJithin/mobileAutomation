@@ -116,24 +116,23 @@ jobs:
           echo "⏳ Waiting for emulator to start..."
           START_TIME=$(date +%s)
 
-          timeout 120 sh -c '
-           while true; do
+          while true; do
             # Check if the emulator is listed
-            adb devices | grep -m 1 "emulator-" > /dev/null; then
-             if [ $? -eq 0 ]; then
-              break
-             fi
+            if adb devices | grep -m 1 "emulator-" > /dev/null; then
+             echo "Emulator is ready!"
+             break
+            fi
 
-             # Check if the timeout has been reached
-             if [$(date +%s) -ge $(($START_TIME + 120))]; then 
+            # Check if the timeout has been reached
+            CURRENT_TIME=$(date %s)
+            if ["$CURRENT_TIME" -ge $(($START_TIME + 120))]; then 
               echo 'Emulator did not start in time...'; 
               exit 1
-             fi
+            fi
            
-             echo "Still waiting for emulator to start..."
-             sleep 5; 
+            echo "Still waiting for emulator to start..."
+            sleep 5; 
            done
-          '
 
           if ! adb devices | grep -q "emulator-"; then
             echo "Emulator did not start correctly. Check emulator logs for details."
