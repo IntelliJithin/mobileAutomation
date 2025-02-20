@@ -123,7 +123,12 @@ jobs:
           adb logcat -d | tail -n 50
  
           echo "⏳ Waiting for emulator to start..."
-          timeout 300 bash -c until adb devices | grep -m 1 "emulator-"; do sleep 5; done'
+          timeout 600 bash -c until adb devices | grep -m 1 "emulator-" || [$(date +%s) -ge $(($START_TIME + 600))]; do sleep 5; done'
+
+          if ! adb devices | grep -q "emulator-"; then
+            echo "Emulator did not start correctly. Check emulator logs for details."
+            exit 1
+          fi
  
           echo "✅ Emulator is ready!"
  
