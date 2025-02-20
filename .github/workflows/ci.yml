@@ -124,7 +124,7 @@ jobs:
             fi
 
             # Check if the timeout has been reached
-            CURRENT_TIME=$(date %s)
+            CURRENT_TIME=$(date +%s)
             if ["$CURRENT_TIME" -ge $(($START_TIME + 120))]; then 
               echo 'Emulator did not start in time...'; 
               exit 1
