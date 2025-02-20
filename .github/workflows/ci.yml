@@ -111,13 +111,19 @@ jobs:
           $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
  
           echo "📢 Starting emulator..."
-          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -verbose > emulator.log 2>&1 &
+          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot > emulator.log 2>&1 &
+
+          echo "Checking running emulator process..."
+          ps aux | grep emulator
+
+          echo "Checking ADB Devices..."
+          adb devices
+
+          echo "Checking ADB Logs..."
+          adb logcat -d | tail -n 50
  
           echo "⏳ Waiting for emulator to start..."
-          adb wait-for-device 
-
-          echo "Checking boot status..."
-          timeout 300 sh -c until adb shell getprop sys.boot_completed | grep -m 1 "1"; do sleep 5; done'
+          timeout 300 bash -c until adb devices | grep -m 1 "emulator-"; do sleep 5; done'
  
           echo "✅ Emulator is ready!"
  
