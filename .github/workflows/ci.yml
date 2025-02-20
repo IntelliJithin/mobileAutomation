@@ -111,7 +111,7 @@ jobs:
           $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
  
           echo "📢 Starting emulator..."
-          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot > emulator.log 2>&1 &
+          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -accel off > emulator.log 2>&1 &
 
           sleep 5
 
