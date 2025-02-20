@@ -95,8 +95,17 @@ jobs:
  
       - name: Set up Android Emulator
         run: |
+
+          echo "📌 Checking if AVD already exists..."
+          if $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd | grep -q "test_emulator"; then
+          echo "✅ AVD already exist!"
+          else
           echo "📌 Creating AVD..."
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-29;default;x86_64" --device "pixel"
+          fi
+
+          echo "📌 Listing available AVDs..."
+          $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
  
           echo "📢 Starting emulator..."
           nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect &
