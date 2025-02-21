@@ -106,9 +106,14 @@ jobs:
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           run: |
 
-            echo "Waiting for emulator to boot..."
-            boot_completed="0"
-            retries=0
+            echo "Checking if the emulator is booted..."
+            boot_complete=$($ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+
+            if [ "$boot_completed" == "1" ]; then
+              echo "Emulator is already booted..."
+            else
+              echo "Waiting for emulator to boot..."
+              retries=0
             while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
               sleep 10
               boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
