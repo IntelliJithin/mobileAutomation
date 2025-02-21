@@ -91,7 +91,7 @@ jobs:
       - name: Fix KVM permissions
         run: |
           echo "Fixing KVM permissions to enable hardware acceleration..."
-          sudo apr-get update
+          sudo apt-get update
           sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
 
           echo "Ensuring KVM group exists..."
