@@ -144,7 +144,7 @@ jobs:
 
             # Check if the timeout has been reached
             CURRENT_TIME=$(date +%s)
-            if [ "$CURRENT_TIME" -ge "$((START_TIME + 120))" ]; then 
+            if [ "$CURRENT_TIME" -ge "$((START_TIME + 180))" ]; then 
               echo 'Emulator did not start in time...'; 
               echo 'Checking emulator logs...'
               cat emulator.log
