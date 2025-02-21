@@ -59,12 +59,10 @@ export const config = {
     capabilities: [{
         // capabilities for local Appium web tests on an Android Emulator
         'appium:platformName': 'Android',
-        'appium:platformVersion': '10.0',
+        'appium:platformVersion': '15.0',
         'appium:deviceName': 'Pixel 9',
         'appium:automationName': 'UIAutomator2',
-        'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk'),
-        'appium:newCommandTimeout': 600,
-        'appium:deviceReadyTimeout': 600
+        'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk')
     }],
 
     //
