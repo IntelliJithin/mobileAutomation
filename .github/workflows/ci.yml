@@ -93,73 +93,18 @@ jobs:
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
  
-      - name: Set up Android Emulator
-        run: |
-          echo "📌 Checking if AVD already exists..."
-          if $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd | grep -q "test_emulator"; then
-          echo "✅ AVD already exist!"
-          else
-          echo "📌 Creating AVD with android 34..."
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-34;google_apis;arm64-v8a" --device "pixel"
-          fi
-
-          echo "📌 Setting AVD Path..."
-          export ANDROID_AVD_HOME=$HOME/.config/.android/avd
-          echo "ANDROID_AVD_HOME=$ANDROID_AVD_HOME" >> $GITHUB_ENV
-
-          echo "📌 Listing available AVDs..."
-          $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
-
-          echo "Ensureing ADB is running..."
-          $ANDROID_HOME/platform-tools/adb start-server
-
-           
-          echo "📢 Starting emulator..."
-          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -no-accel > emulator.log 2>&1 &
-          sleep 5
-
-          echo "Checking if emulator process is running..."
-          if ! pgrep -f "emulator" > /dev/null; then
-           echo "Emulator failed to start! Check emulator.log for details."
-           cat emulator.log
-           exit 1
-          fi
-
-          echo "Listing connected devices/emulators (before waiting)..."
-          adb devices
-
-          echo "⏳ Waiting for emulator to start..."
-          START_TIME=$(date +%s)
-
-          while true; do
-            # Check if the emulator is listed and is now online
-            if adb devices |grep -m 1 "emulator-" | grep -q "device"; then
-             echo "Emulator is ready and online!"
-             break
-            fi
-
-            # Check if the timeout has been reached
-            CURRENT_TIME=$(date +%s)
-            if [ "$CURRENT_TIME" -ge "$((START_TIME + 180))" ]; then 
-              echo 'Emulator did not start in time...'; 
-              echo 'Checking emulator logs...'
-              cat emulator.log
-              exit 1
-            fi
-
-            STATUS=$(adb devices | grep -m 1 "emulator-" | awk '{print $2}')
-            echo "Still waiting for emulator to be ready (current status: $STATUS)..."
-            sleep 5; 
-           done
-
-      
-          if ! adb devices | grep -q "emulator-.*offline"; then
-            echo "Emulator did not start correctly. Check emulator logs for details."
-            cat emulator.log
-            exit 1
-          fi
- 
-          echo "✅ Emulator is ready!"
+      - name: Start android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with: 
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel
+          ram-size: 2048M
+          sdcard-path-or-size: 512M
+          disable-animations: true
+          script: adb devices
+        
  
       - name: List installed Appium drivers
         run: appium driver list --installed
