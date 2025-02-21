@@ -104,26 +104,28 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: adb devices
+          script: |
 
-      - name: Wait for Emulator to boot
-        run: |
-          echo "Waiting for emulator to boot..."
-          boot_completed="0"
-          retries=0
-          while [ "$boot_completed" != "1" ] && [ "$retries" -lt 30 ]; do
-            sleep 10
-            boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-            echo "Attempt $retries: Emulator boot completed: $boot_completed"
-            retries=$((retries + 1))
-          done
-          if [ "$boot_completed" != "1" ]; then
-            echo "Emulator did not boot in time!"
-            exit 1
-          fi
-          echo "Emulator is ready!"
+            echo "Waiting for emulator to boot..."
+            boot_completed="0"
+            retries=0
+            
+            while [ "$boot_completed" != "1" ] && [ "$retries" -lt 30 ]; do
+              sleep 10
+              boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+              echo "Attempt $retries: Emulator boot completed: $boot_completed"
+              retries=$((retries + 1))
+            done
+            
+            if [ "$boot_completed" != "1" ]; then
+              echo "Emulator did not boot in time!"
+              exit 1
+            fi
+
+            echo "Emulator is ready!"
+            adb devices
           
-      - name: Restard ADB if Device is offline
+      - name: Restart ADB if Device is offline
         run: |
           echo "Checking ADB device status..."
           adb_status=$($ANDROID_HOME/platform-tools/adb get-state 2>&1)
