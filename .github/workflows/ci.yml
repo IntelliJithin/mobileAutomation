@@ -86,7 +86,7 @@ jobs:
       - name: Install Vulkan and OpenGL libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libvulkan libgles2-mesa   
+          sudo apt-get install -y libvulkan1 libgles2-mesa mesa-utils   
 
       - name: Fix KVM permissions
         run: |
