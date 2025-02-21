@@ -91,10 +91,32 @@ jobs:
       - name: Fix KVM permissions
         run: |
           echo "Fixing KVM permissions to enable hardware acceleration..."
-          sudo gpasswd -a $USER kvm
+          sudo apr-get update
           sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+
+          echo "Ensuring KVM group exists..."
+          if ! grep -q "^kvm:" /etc/group; then
+            sudo groupadd -r kvm
+          fi
+
+          echo "Adding current user to KVM group..."
+          sudo gpasswd -a $USER kvm
+
+          echo "Changing /dev/kvm permissions..."
+          sudo chown root:kvm /dev/kvm
+          sudo chmod 660 /dev/kvm
+
+          echo "Restarting libvirt service..."
           sudo systemctl enable libvirtd
           sudo systemctl start libvirtd
+
+          echo "Verifying KVM access..."
+          if ! ls /dev/kvm; then
+            echo "ERROR: KVM device not found. Make sure virtualization is enabled in your system."
+            exit 1
+          fi
+
+          echo "KVM setup completed successfully!"
 
       - name: Verify SDK Installation
         run: |
