@@ -83,6 +83,19 @@ jobs:
          echo "📌 Listing installed SDK components..."
          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list
 
+      - name: Install Vulkan and OpenGL libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvulkan libgles2-mesa   
+
+      - name: Fix KVM permissions
+        run: |
+          echo "Fixing KVM permissions to enable hardware acceleration..."
+          sudo gpasswd -a $USER kvm
+          sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+          sudo systemctl enable libvirtd
+          sudo systemctl start libvirtd
+
       - name: Verify SDK Installation
         run: |
           echo "Checking Android SDK paths..."
@@ -113,16 +126,9 @@ jobs:
           echo "Ensureing ADB is running..."
           $ANDROID_HOME/platform-tools/adb start-server
 
-          # Check for KVM permissions
-          if [ ! -w /dev/kvm ]; then
-           echo "KVM permissions issue detected! Running without hardware acceleration..."
-           ACCEL_FLAG="-no-accel"
-          else
-           ACCEL_FLAG="-accel on"
-          fi
- 
+           
           echo "📢 Starting emulator..."
-          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect $ACCEL_FLAG -no-snapshot > emulator.log 2>&1 &
+          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -qemu -vnc :1 > emulator.log 2>&1 &
           sleep 5
 
           echo "Checking if emulator process is running..."
