@@ -140,29 +140,27 @@ jobs:
 
           while true; do
             # Check if the emulator is listed and is now online
-            DEVICE_STATUS=$(adb devices | grep -m 1 "emulator-" | awk '{print $2}')
-            if ["$DEVICE_STATUS" == "device"]; then
+            if adb devices |grep -m 1 "emulator-" | grep -q "device"; then
              echo "Emulator is ready and online!"
              break
             fi
 
             # Check if the timeout has been reached
             CURRENT_TIME=$(date +%s)
-            if [ "$CURRENT_TIME" -ge "$((START_TIME + 300))" ]; then 
+            if [ "$CURRENT_TIME" -ge "$((START_TIME + 180))" ]; then 
               echo 'Emulator did not start in time...'; 
               echo 'Checking emulator logs...'
               cat emulator.log
               exit 1
             fi
-           
-            echo "Still waiting for emulator to be ready (current status: $DEVICE_STATUS)..."
+
+            STATUS=$(adb devices | grep -m 1 "emulator-" | awk '{print $2}')
+            echo "Still waiting for emulator to be ready (current status: $STATUS)..."
             sleep 5; 
            done
 
-          echo "Listing connected devices/emulators (after waiting)..."
-          adb devices
-
-          if ! adb devices | grep -q "emulator-"; then
+      
+          if ! adb devices | grep -q "emulator-.*offline"; then
             echo "Emulator did not start correctly. Check emulator logs for details."
             cat emulator.log
             exit 1
