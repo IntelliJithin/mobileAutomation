@@ -104,7 +104,7 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: |
+          run: |
 
             echo "Waiting for emulator to boot..."
             boot_completed="0"
