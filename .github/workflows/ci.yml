@@ -78,7 +78,7 @@ jobs:
          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || echo "⚠️ License acceptance failed"
  
          echo "📥 Installing required SDK packages..."
-         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "build-tools;34.0.0" "platforms;android-15" "system-images;android-U;google_apis;x86_64"
+         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "build-tools;34.0.0" "platforms;android-34" "system-images;android-34;google_apis;x86_64"
  
          echo "📌 Listing installed SDK components..."
          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list
@@ -100,7 +100,7 @@ jobs:
           echo "✅ AVD already exist!"
           else
           echo "📌 Creating AVD with android 15..."
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-15;default;x86_64" --device "pixel"
+          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-34;google_apis;x86_64" --device "pixel"
           fi
 
           echo "📌 Setting AVD Path..."

@@ -59,8 +59,8 @@ export const config = {
     capabilities: [{
         // capabilities for local Appium web tests on an Android Emulator
         'appium:platformName': 'Android',
-        'appium:platformVersion': '15.0',
-        'appium:deviceName': 'test_emulator',
+        'appium:platformVersion': '14.0',
+        'appium:deviceName': 'pixel',
         'appium:automationName': 'UIAutomator2',
         'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk'),
         'appium:newCommandTimeout': 60000,
