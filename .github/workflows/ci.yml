@@ -104,38 +104,34 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: |
+          run: |
 
-            echo "Checking if an emulator is already running..."
-            if adb get-state 2>&1 | grep -q "device"; then
-              echo "Emulator is already running!"
-            else
-              echo "Starting a fresh emulator session..."
-              nohup emulator -avd emulator-5554 -no-snapshot -no-audio -no-window &
-              sleep 5
-            fi
-
-            echo "Waiting for emulator to boot..."
-            boot_completed="0"
+            echo "🛠 Killing any existing emulator process..."
+            adb kill-server || true
+            pkill -f "emulator" || true
+            sleep 5
+ 
+            echo "🚀 Launching emulator in headless mode..."
+            nohup $ANDROID_HOME/emulator/emulator -avd emulator-5554 -no-audio -no-window -no-snapshot -gpu swiftshader_indirect > emulator.log 2>&1 &
+ 
+            echo "⏳ Waiting for emulator to fully boot..."
             retries=0
-            while [ "$boot_completed" != "1" ] && [ "$retries" -lt 30 ]; do
+            adb_status="offline"
+            while [[ "$adb_status" == "offline" || "$adb_status" == "" ]] && [ "$retries" -lt 60 ]; do
               sleep 10
-              boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-              echo "Attempt $retries: Emulator boot completed: $boot_completed"
+              adb devices
+              adb_status=$(adb -s emulator-5554 get-state)
+              echo "Attempt $retries: ADB status: $adb_status"
               retries=$((retries + 1))
             done
-            
-            if [ "$boot_completed" != "1" ]; then
-              echo "Emulator did not boot in time!"
-              $ANDROID_HOME/platform-tools/adb kill-server
-              sleep 5
-              $ANDROID_HOME/platform-tools/adb start-server
-              sleep 5
-              adb devices
+ 
+            if [[ "$adb_status" != "device" ]]; then
+              echo "❌ Emulator did not connect properly! ADB Status: $adb_status"
+              cat emulator.log
               exit 1
             fi
-
-            echo "Emulator is ready!"
+ 
+          echo "✅ Emulator is fully connected and ready!"
         
  
       - name: List installed Appium drivers
