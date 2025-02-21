@@ -132,16 +132,17 @@ jobs:
            exit 1
           fi
 
-          echo "Listing connected devices/emulators..."
+          echo "Listing connected devices/emulators (before waiting)..."
           adb devices
 
           echo "⏳ Waiting for emulator to start..."
           START_TIME=$(date +%s)
 
           while true; do
-            # Check if the emulator is listed
-            if adb devices | grep -m 1 "emulator-" > /dev/null; then
-             echo "Emulator is ready!"
+            # Check if the emulator is listed and is now online
+            DEVICE_STATUS=$(adb devices | grep -m 1 "emulator-" | awk '{print $2}')
+            if ["$DEVICE_STATUS" == "device"]; then
+             echo "Emulator is ready and online!"
              break
             fi
 
@@ -154,9 +155,12 @@ jobs:
               exit 1
             fi
            
-            echo "Still waiting for emulator to start..."
+            echo "Still waiting for emulator to be ready (current status: $DEVICE_STATUS)..."
             sleep 5; 
            done
+
+          echo "Listing connected devices/emulators (after waiting)..."
+          adb devices
 
           if ! adb devices | grep -q "emulator-"; then
             echo "Emulator did not start correctly. Check emulator logs for details."
