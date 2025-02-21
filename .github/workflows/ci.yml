@@ -88,7 +88,7 @@ jobs:
           echo "Checking Android SDK paths..."
           ls -la $ANDROID_HOME
           ls -la $ANDROID_HOME/platforms
-          ls -la $ANDROID_HOME/system-images/android-29
+          ls -la $ANDROID_HOME/system-images/android-34
 
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
