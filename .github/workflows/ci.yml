@@ -106,10 +106,18 @@ jobs:
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           script: |
 
+            echo "Checking if an emulator is already running..."
+            if adb get-state 2>&1 | grep -q "device"; then
+              echo "Emulator is already running!"
+            else
+              echo "Starting a fresh emulator session..."
+              nohup emulator -avd emulator-5554 -no-snapshot -no-audio -no-window &
+              sleep 5
+            fi
+
             echo "Waiting for emulator to boot..."
             boot_completed="0"
             retries=0
-            
             while [ "$boot_completed" != "1" ] && [ "$retries" -lt 30 ]; do
               sleep 10
               boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
@@ -119,25 +127,15 @@ jobs:
             
             if [ "$boot_completed" != "1" ]; then
               echo "Emulator did not boot in time!"
+              $ANDROID_HOME/platform-tools/adb kill-server
+              sleep 5
+              $ANDROID_HOME/platform-tools/adb start-server
+              sleep 5
+              adb devices
               exit 1
             fi
 
             echo "Emulator is ready!"
-            adb devices
-          
-      - name: Restart ADB if Device is offline
-        run: |
-          echo "Checking ADB device status..."
-          adb_status=$($ANDROID_HOME/platform-tools/adb get-state 2>&1)
-          if [[ "$adb_status" == *"offline"* ]]: then
-            echo "ADB device is offline! Restarting ADB..."
-            $ANDROID_HOME/platform-tools/adb kill-server
-            sleep 5
-            $ANDROID_HOME/platform-tools/adb start-server
-            sleep 5
-            echo "Rechecking ADB status..."
-            $ANDROID_HOME/platform-tools/adb devices
-          fi    
         
  
       - name: List installed Appium drivers
