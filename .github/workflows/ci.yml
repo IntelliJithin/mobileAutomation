@@ -110,7 +110,10 @@ jobs:
             adb start-server
             adb services
 
-            echo "Emulator should now be recognized by ADB"
+            echo "Waiting to ensure emulator stays active"
+            sleep 30
+
+            echo "Em0ulator should be ready now"
             
 
       - name: List installed Appium drivers
