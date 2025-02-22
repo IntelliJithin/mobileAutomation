@@ -98,7 +98,7 @@ jobs:
           echo "Checking system memory usage..."
           free -h
           echo "Checking CPU usage..."
-          top -n 1
+          ps aux --sort=-%cpu | head -n 10
           echo "Checking disk usage..."
           df -h     
  
@@ -139,7 +139,7 @@ jobs:
           echo "Checking system memory usage"
           free -h
           echo "checking CPU usage"
-          top -n 1
+          ps aux --sort=-%cpu | head -n 10
           echo "Checking disk usage"
           df -h
 
