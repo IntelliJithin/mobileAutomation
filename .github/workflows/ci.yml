@@ -107,7 +107,7 @@ jobs:
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
         env:
           ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
-          script: adb devices
+        script: adb devices
             
 
       - name: List installed Appium drivers
