@@ -104,6 +104,7 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
+          script: adb devices
  
       - name: List installed Appium drivers
         run: appium driver list --installed
