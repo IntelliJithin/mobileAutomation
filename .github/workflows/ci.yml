@@ -124,11 +124,10 @@ jobs:
               if [ "$boot_completed" != "1" ]; then
                 echo "Emulator did not boot in time!"
                 exit 1
+              else
+                echo "Emulator is ready!"
               fi
-
-              echo "Emulator is ready!"
             fi
-
             sleep 30
         
  
