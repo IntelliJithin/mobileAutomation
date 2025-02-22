@@ -105,39 +105,9 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: |
-            echo "Restarting ADB"
-            adb kill-server
-            adb start-server
-            adb devices
-
-            echo "Waiting to ensure emulator stays active"
-            sleep 30
-
-            echo "Emulator should be ready now"
-
-            retries = 0
-            boot_completed = 0
-            while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
-              sleep 10
-              boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-              echo "Boot completed status = $boot_completed"
-              retries = $((retries + 1))
-            done
-
-            if [ "$boot_completed" != "1" ]; then
-              echo "Emulator did not boot in time"
-              exit 1
-            fi
-            echo "Emulator fully booted"
-
-            while true; do
-              adb shell input keyevent 82
-              sleep 60
-            done
-
-            echo "Terminating emulator"
-            adb emu kill
+        env:
+          ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
+          script: adb devices
             
 
       - name: List installed Appium drivers
