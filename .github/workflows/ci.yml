@@ -106,13 +106,39 @@ jobs:
           ram-size: 4096M
           sdcard-path-or-size: 1024M
           disable-animations: true
-          emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
+          emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap -delay-adb 300000"
           script: adb devices
         
       - name: Check emulator Status
         run: |
-          echo "Waiting for emulator to boot..."
+          echo "Waiting for emulator to stabilize..."
+          sleep 30
+          echo "Listing devices"
           adb devices
+
+          echo "Checking if the emulator is booted..."
+          boot_completed=0
+          retries=0
+          while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
+            sleep 5
+            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            echo "Boot completed status: $boot_completed"
+            retries=$((retries + 1))
+          done
+
+          if [ "$boot_completed" == "1" ]; then
+            echo "Emulator is fully booted and ready"
+          else
+            echo "Emulator did not boot in time"
+            exit 1
+          fi
+
+      - name: Restart ADB to ensure connection
+        run: |
+          echo "Restarting ADB to fix potential 'device offline' issues..."
+          adb kill-server
+          adb start-server
+          adb devices     
             
 
       - name: List installed Appium drivers
