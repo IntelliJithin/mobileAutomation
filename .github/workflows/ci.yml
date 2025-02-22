@@ -127,7 +127,7 @@ jobs:
  
               if [ "$boot_completed" == "1" ]; then
                 echo "✅ Emulator booted successfully!"
-                break
+                exit 0
               fi
  
               retries=$((retries + 1))
@@ -137,12 +137,6 @@ jobs:
               echo "❌ Emulator did not boot in time!"
               exit 1
             fi
- 
-            echo "✅ Emulator is fully booted. Ensuring ADB is connected..."
-            $ANDROID_HOME/platform-tools/adb wait-for-device
- 
-            echo "🔓 Unlocking screen..."
-            $ANDROID_HOME/platform-tools/adb shell input keyevent 82 || echo "⚠️ Failed to unlock emulator"
         
  
       - name: List installed Appium drivers
