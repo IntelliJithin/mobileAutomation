@@ -108,7 +108,7 @@ jobs:
             echo "Restarting ADB"
             adb kill-server
             adb start-server
-            adb services
+            adb devices
 
             echo "Waiting to ensure emulator stays active"
             sleep 30
