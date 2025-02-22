@@ -106,29 +106,43 @@ jobs:
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           script: |
 
-            echo "Checking if the emulator is booted..."
-            boot_complete=$($ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-
-            if [ "$boot_completed" == "1" ]; then
-              echo "Emulator is already booted..."
-            else
-              echo "Waiting for emulator to boot..."
-              retries=0
-              while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
-                sleep 10
-                boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-                echo "Attempt $retries: Emulator boot completed: $boot_completed"
-                retries=$((retries + 1))
-              done
+            echo "🔄 Waiting for emulator to boot..."
+            retries=0
+            boot_completed=0
+ 
+            while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
+              sleep 10
+               echo "Attempt $((retries + 1)): Checking emulator boot status..."
             
-              if [ "$boot_completed" != "1" ]; then
-                echo "Emulator did not boot in time!"
-                exit 1
-              else
-                echo "Emulator is ready!"
+              # Ensure ADB server is running
+              $ANDROID_HOME/platform-tools/adb start-server
+ 
+              # List devices to debug the connection
+              $ANDROID_HOME/platform-tools/adb devices
+            
+              # Get boot completion status
+              boot_completed=$($ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+ 
+              echo "Boot completed status: $boot_completed"
+ 
+              if [ "$boot_completed" == "1" ]; then
+                echo "✅ Emulator booted successfully!"
+                break
               fi
+ 
+              retries=$((retries + 1))
+            done
+ 
+            if [ "$boot_completed" != "1" ]; then
+              echo "❌ Emulator did not boot in time!"
+              exit 1
             fi
-            sleep 30
+ 
+            echo "✅ Emulator is fully booted. Ensuring ADB is connected..."
+            $ANDROID_HOME/platform-tools/adb wait-for-device
+ 
+            echo "🔓 Unlocking screen..."
+            $ANDROID_HOME/platform-tools/adb shell input keyevent 82 || echo "⚠️ Failed to unlock emulator"
         
  
       - name: List installed Appium drivers
