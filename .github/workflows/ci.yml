@@ -98,7 +98,6 @@ jobs:
         timeout-minutes: 30
         env:
           ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
-          ADB_INSTALL_TIMEOUT: 10
         with: 
           api-level: 34
           target: google_apis
@@ -112,34 +111,17 @@ jobs:
         
       - name: Check emulator Status
         run: |
-          echo "Waiting for emulator to stabilize..."
-          sleep 30
-          echo "Listing devices"
+          echo "Waiting for emulator to be detected by ADB..."
+          adb wait-for-device
           adb devices
 
-          echo "Checking if the emulator is booted..."
-          boot_completed=0
-          retries=0
-          while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
-            sleep 5
-            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-            echo "Boot completed status: $boot_completed"
-            retries=$((retries + 1))
-          done
-
-          if [ "$boot_completed" == "1" ]; then
-            echo "Emulator is fully booted and ready"
-          else
-            echo "Emulator did not boot in time"
-            exit 1
-          fi
-
-      - name: Restart ADB to ensure connection
-        run: |
           echo "Restarting ADB to fix potential 'device offline' issues..."
           adb kill-server
           adb start-server
-          adb devices     
+          adb devices
+
+          echo "Preventing Emulator from shutting down..."
+          while true; do adb shell input keyevent 82; sleep 60; done & 
             
 
       - name: List installed Appium drivers
