@@ -104,7 +104,12 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: adb devices
+          script: |
+            echo "Emulator started, ensuring ADB connection"
+            adb wait-for-device
+            adb shell input keyevent 82
+            adb devices
+            echo "Emulator is ready!"
  
       - name: List installed Appium drivers
         run: appium driver list --installed
