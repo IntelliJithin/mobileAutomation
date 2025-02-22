@@ -104,40 +104,6 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: |
-
-            echo "🔄 Waiting for emulator to boot..."
-            retries=0
-            boot_completed=0
- 
-            while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
-              sleep 10
-               echo "Attempt $((retries + 1)): Checking emulator boot status..."
-            
-              # Ensure ADB server is running
-              $ANDROID_HOME/platform-tools/adb start-server
- 
-              # List devices to debug the connection
-              $ANDROID_HOME/platform-tools/adb devices
-            
-              # Get boot completion status
-              boot_completed=$($ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
- 
-              echo "Boot completed status: $boot_completed"
- 
-              if [ "$boot_completed" == "1" ]; then
-                echo "✅ Emulator booted successfully!"
-                exit 0
-              fi
- 
-              retries=$((retries + 1))
-            done
- 
-            if [ "$boot_completed" != "1" ]; then
-              echo "❌ Emulator did not boot in time!"
-              exit 1
-            fi
-        
  
       - name: List installed Appium drivers
         run: appium driver list --installed
