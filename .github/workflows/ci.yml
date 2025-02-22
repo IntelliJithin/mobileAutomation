@@ -114,12 +114,30 @@ jobs:
             echo "Waiting to ensure emulator stays active"
             sleep 30
 
-            echo "Em0ulator should be ready now"
+            echo "Emulator should be ready now"
+
+            retries = 0
+            boot_completed = 0
+            while [ "$boot_completed" != "1" ] && [ "$retries" -lt 60 ]; do
+              sleep 10
+              boot_completed=$(ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+              echo "Boot completed status = $boot_completed"
+              retries = $((retries + 1))
+            done
+
+            if [ "$boot_completed" != "1" ]; then
+              echo "Emulator did not boot in time"
+              exit 1
+            fi
+            echo "Emulator fully booted"
 
             while true; do
               adb shell input keyevent 82
               sleep 60
             done
+
+            echo "Terminating emulator"
+            adb emu kill
             
 
       - name: List installed Appium drivers
