@@ -105,12 +105,14 @@ jobs:
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           script: |
-            echo "Checking connected devices..."
-            adb devices
+            echo "Restarting ADB"
+            adb kill-server
+            adb start-server
+            adb services
 
-            echo "Keeping emulator alive..."
-            while true; do sleep 30; echo "Emulator is running..."; done &
+            echo "Emulator should now be recognized by ADB"
             
+
       - name: List installed Appium drivers
         run: appium driver list --installed
  
