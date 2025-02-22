@@ -95,6 +95,7 @@ jobs:
  
       - name: Start android emulator
         uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 30
         with: 
           api-level: 34
           target: google_apis
@@ -114,6 +115,11 @@ jobs:
             sleep 30
 
             echo "Em0ulator should be ready now"
+
+            while true; do
+              adb shell input keyevent 82
+              sleep 60
+            done
             
 
       - name: List installed Appium drivers
