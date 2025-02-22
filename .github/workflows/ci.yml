@@ -104,7 +104,7 @@ jobs:
  
       - name: Start android emulator
         uses: reactivecircus/android-emulator-runner@v2
-        timeout-minutes: 60
+        timeout-minutes: 30
         env:
           ANDROID_EMULATOR_WAIT_TIME_KILL: 600
         with: 
@@ -112,16 +112,25 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel
-          ram-size: 2048M
+          ram-size: 8192M
+          cpu-core: 4
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap -delay-adb"
-          script: adb devices
+          script: |
+            adb wait-for-device
+            adb devices
+
+      - name: Wait for ADB to connect
+        run: | 
+          for i in {1..10}; do
+            adb wait-for-device && break || sleep 10
+          done
 
       - name: Capture Emulator logs with logcat
         run: |
-          adb logcat -d > emulator_logs.txt
-          cat emulator_logs.txt
+          nohup adb logcat -v time > emulator_logs.txt &
+          echo "Start capturing emulator logs..."
         
       - name: Check emulator Status
         run: |
@@ -142,6 +151,13 @@ jobs:
           ps aux --sort=-%cpu | head -n 10
           echo "Checking disk usage"
           df -h
+
+      - name: Upload emulator logs if failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with: 
+          name: emulator-logs
+          path: emulator_logs.txt
 
       - name: Prevent emulator from shutting down
         run: |
