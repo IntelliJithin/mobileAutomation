@@ -93,7 +93,7 @@ jobs:
  
       - name: Start android emulator
         uses: reactivecircus/android-emulator-runner@v2
-        timeout-minutes: 30
+        timeout-minutes: 60
         env:
           ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 1800
         with: 
@@ -105,7 +105,12 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: adb devices
+          script: |
+            echo "Waiting for emulator to boot"
+            adb wait-for-device
+            adb shell input keyevent 82
+            echo "emulator booted"
+            while true; do sleep 60; done
         
       - name: Check emulator Status
         run: |
