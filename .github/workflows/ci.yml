@@ -34,7 +34,6 @@ jobs:
           fi
           
           INSTALLED_DRIVERS=$(appium driver list --installed 2>&1 || echo "Error: Appium command failed")
-
           if echo "$INSTALLED_DRIVERS" | grep -q "uiautomator2"; then
            echo "uiautomator2 is already installed. Skipping reinstallation."
           else
@@ -89,30 +88,30 @@ jobs:
           ls -la $ANDROID_HOME
           ls -la $ANDROID_HOME/platforms
           ls -la $ANDROID_HOME/system-images/android-34
-
           echo "Checking available SDK packages..."
-          sdkmanager --list || echo "sdkmanager command failed"    
+          sdkmanager --list || echo "sdkmanager command failed"
  
       - name: Start android emulator
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 30
+        env:
+          ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
         with: 
           api-level: 34
           target: google_apis
           arch: x86_64
           profile: pixel
-          ram-size: 6144M
-          cores: 4
+          ram-size: 4096M
           sdcard-path-or-size: 1024M
           disable-animations: true
-          emulator-options: "-no-window -no-audio -no-boot-anim -gpu off -no-snapshot -tcpdump tcpdump.pcap"
-          no-terminate: true
-          script: |
-            adb devices
-            adb -s emulator-5554 logcat -d | tail -n 100
-            adb -s emulator-5554 shell "while [[ \$(getprop sys.boot_completed) != 1]]; do sleep 1; done;"
-            echo "Emulator is ready"
-
+          emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
+          script: adb devices
+        
+      - name: Check emulator Status
+        run: |
+          echo "Waiting for emulator to boot..."
+          adb devices
+            
       - name: List installed Appium drivers
         run: appium driver list --installed
  
