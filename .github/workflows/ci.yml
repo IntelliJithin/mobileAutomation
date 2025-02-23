@@ -106,29 +106,18 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 30
         env:
-          ANDROID_EMULATOR_WAIT_TIME_KILL: 600
+          ANDROID_EMULATOR_WAIT_TIME_KILL: 300
         with: 
           api-level: 34
           target: google_apis
-          arch: x86_64
+          arch: arm64-v8a
           profile: pixel
-          ram-size: 8192M
+          ram-size: 6144M
           cores: 4
           sdcard-path-or-size: 1024M
           disable-animations: true
-          emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap -delay-adb"
+          emulator-options: "-no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -skin 720x1280 -memory 6144 -snapshot save"
           script: adb devices
-
-      - name: Wait for ADB to connect
-        run: | 
-          for i in {1..10}; do
-            adb wait-for-device && break || sleep 10
-          done
-
-      - name: Capture Emulator logs with logcat
-        run: |
-          nohup adb logcat -v time > emulator_logs.txt &
-          echo "Start capturing emulator logs..."
         
       - name: Check emulator Status
         run: |
@@ -141,24 +130,13 @@ jobs:
           adb start-server
           adb devices
 
-      - name: Check system resources after starting emulator
-        run: |
-          echo "Checking system memory usage"
-          free -h
-          echo "checking CPU usage"
-          ps aux --sort=-%cpu | head -n 10
-          echo "Checking disk usage"
-          df -h
+          echo "Optimizing emulator performance..."
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_Scale 0
+          adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS
 
-      - name: Upload emulator logs if failure
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with: 
-          name: emulator-logs
-          path: emulator_logs.txt
-
-      - name: Prevent emulator from shutting down
-        run: |
+          echo "Preventing emulator from shutting down..."
           while true; do adb shell input keyevent 82; sleep 60; done &
             
 
