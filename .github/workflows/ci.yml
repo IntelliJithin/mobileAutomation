@@ -106,39 +106,12 @@ jobs:
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           script: |
-            echo "Starting emulator"
+            echo "Starting emulator..."
+            adb wait-for-devices
+            adb shell getprop init.svc.bootanim 
             adb devices
-            adb wait-for-devices || echo "ADB failed to detect the device"
-            adb shell getprop init.svc.bootanim || echo "Boot animation status not found"
-            adb shell input keyevent 82 || echo "Failed to send key event"
-            adb shell dumpsys power || echo "Power service is not available"
-            adb logcat -d -b main -b systems -b crash || echo "No logcats logs found"
-            echo "Emulator should be running now"
-            adb devices
-
-      - name: Start Emulator manually
-        if: failure()
-        run: |
-          echo "android-emulator-runner failed, starting emulator manually"
-          nohup $ANDROID_HOME/emulator/emulator -avd Pixel_3a_API_34 -no-window -no-audio -no-boot-anim -gpu switfshader_indirect -no-snapshot > emulator.log 2>&1 &
-          sleep 60
-          adb devices
-          adb shell getprop init.svc.bootanim   
-        
-      - name: Check emulator Status
-        run: |
-          echo "Checking if emulator is running..."
-          adb devices
-          adb shell getprop init.svc.bootanim
-            
-      - name: List installed Appium drivers
-        run: appium driver list --installed
- 
-      - name: Fix Permissions
-        run: chmod +x node_modules/.bin/wdio
- 
-      - name: 🧪 Run WebdriverIO Tests
-        run: npx wdio wdio.conf.js
+            echo "Running tests now..."
+            npx wdio wdio.conf.js
  
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
