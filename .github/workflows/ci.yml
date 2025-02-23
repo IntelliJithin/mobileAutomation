@@ -99,11 +99,20 @@ jobs:
 
           echo "Waiting for emulator to boot"
           adb wait-for-device
+
+          boot_completed=0
+          while [[ "$boot_completed" -ne 1 ]]; do
+            echo "Waiting for sys.boot_completed"
+            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            sleep 5
+          done
+          echo "Emulator fully booted"
+
           adb shell input keyevent 82
 
           echo "Checking emulator status"
           adb devices
-          sleep 10
+          sleep 5
           adb devices
 
           echo "Starting logcat capture"
