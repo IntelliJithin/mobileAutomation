@@ -105,7 +105,7 @@ jobs:
           cores: 4
           sdcard-path-or-size: 1024M
           disable-animations: true
-          emulator-options: "-no-window -no-audio -no-boot-anim -gpu off swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
+          emulator-options: "-no-window -no-audio -no-boot-anim -gpu off -no-snapshot -tcpdump tcpdump.pcap"
           script: |
             adb devices
             adb -s emulator-5554 logcat -d | tail -n 100
