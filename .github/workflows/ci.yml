@@ -91,16 +91,7 @@ jobs:
           ls -la $ANDROID_HOME/system-images/android-34
 
           echo "Checking available SDK packages..."
-          sdkmanager --list || echo "sdkmanager command failed"
-
-      - name: Check system resources before starting emulator
-        run: |
-          echo "Checking system memory usage..."
-          free -h
-          echo "Checking CPU usage..."
-          ps aux --sort=-%cpu | head -n 10
-          echo "Checking disk usage..."
-          df -h     
+          sdkmanager --list || echo "sdkmanager command failed"    
  
       - name: Start android emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -113,7 +104,7 @@ jobs:
           cores: 4
           sdcard-path-or-size: 1024M
           disable-animations: true
-          emulator-options: "-no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -skin 720x1280 -memory 6144 -snapshot save"
+          emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           script: adb devices
             
 
