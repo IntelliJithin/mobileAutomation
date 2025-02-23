@@ -107,7 +107,8 @@ jobs:
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           script: |
             adb devices
-            adb -s emulator-5554 shell getprop sys.boot_completed
+            adb -s emulator-5554 shell "while [[ \$(getprop sys.boot_completed) != 1]]; do sleep 1; done;"
+            echo "Emulator is ready"
 
       - name: List installed Appium drivers
         run: appium driver list --installed
