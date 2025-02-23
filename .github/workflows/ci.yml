@@ -105,7 +105,33 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-          script: adb devices
+        run: |
+          echo "Starting logcat capture"
+          adb logcat > logcat_live.txt & 
+          EMULATOR_PID=$!
+          echo "Emulator process ID: $EMULATOR_PID"
+
+          echo "Waiting for emulator to boot"
+          adb -e wait-for-device
+          adb shell input keyevent 82
+
+          echo "Checking emulator status"
+          adb devices
+
+          echo "Waiting a bit to ensure emulator stability"
+          sleep 20
+
+          echo "Stopping logcat capture"
+          pkill -f "adb logcat"
+          echo "Logcat output saved to logcat_live.txt"
+
+      - name: Upload logcat logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: logcat-logs
+          path: logcat_live.txt
+          
         
       - name: Check emulator Status
         run: |
