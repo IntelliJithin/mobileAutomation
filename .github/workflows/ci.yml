@@ -105,10 +105,10 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
-        script: |
-          echo "Starting logcat captures"
-          nohup adb logcat > logcat_live.txt 2>&1 &
-          echo "Logcat is running in the background"
+          script: |
+            echo "Starting logcat captures"
+            nohup adb logcat > logcat_live.txt 2>&1 &
+            echo "Logcat is running in the background"
 
       - name: Upload logcat logs
         uses: actions/upload-artifact@v4
