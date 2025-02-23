@@ -117,9 +117,7 @@ jobs:
           sdcard-path-or-size: 1024M
           disable-animations: true
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap -delay-adb"
-          script: |
-            adb wait-for-device
-            adb devices
+          script: adb devices
 
       - name: Wait for ADB to connect
         run: | 
