@@ -107,7 +107,7 @@ jobs:
           emulator-options: "-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -tcpdump tcpdump.pcap"
           script: |
             echo "Starting emulator..."
-            adb wait-for-devices
+            adb wait-for-device
             adb shell getprop init.svc.bootanim 
             adb devices
             echo "Running tests now..."
