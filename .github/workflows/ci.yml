@@ -116,7 +116,7 @@ jobs:
             echo "Installing UiAutomator2 server APK"
             adb install downloaded_apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server"
             echo "Installing UiAutomator2 server test APK"
-            adb install downloaded_apks/appium-uiautomator2-server-debug.androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
+            adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
 
             echo "Granting necessary permissions..."
