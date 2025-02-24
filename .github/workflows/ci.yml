@@ -106,14 +106,18 @@ jobs:
 
             DOWNLOAD_DIR="/home/runner/work/mobileAutomation/mobileAutomation"
 
+            mkdir -p $DOWNLOAD_DIR
+
             echo "Downloading Appium setting APK"
             curl -L -o $DOWNLOAD_DIR/settings_apk-debug.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/settings_apk-debug.apk
             echo "Downloading UiAutomator2 Server APK"
             curl -L -o $DOWNLOAD_DIR/appium-uiautomator-server-v7.2.3.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/appium-uiautomator2-server-v7.2.3.apk
 
-            echo "Current directory is: $(pwd)"
             echo "List files in current directory"
             ls -l $DOWNLOAD_DIR
+
+            chmod +x $DOWNLOAD_DIR/settings_apk-debug
+            chmod +x $DOWNLOAD_DIR/appium-uiautomator2-server-v7.2.3.apk
 
             echo "Installing Appium settings APK"
             adb install $DOWNLOAD_DIR/settings_apk_debug.apk || echo "Failed to install setting apk"
