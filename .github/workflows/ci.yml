@@ -105,9 +105,9 @@ jobs:
             adb devices
 
             echo "Installing Appium settings APK"
-            adb install $(npm root -g)/appium/node_modules/appium-uiautomator2-driver/apks/settings_apk_debug.apk || echo "Failed to install setting apk"
+            adb install ./node_modules/appium-uiautomator2-driver/apks/settings_apk_debug.apk || echo "Failed to install setting apk"
             echo "Installing UiAutomator2 server APK"
-            adb install $(npm root -g)/appium/node_modules/appium-uiautomator2-driver/apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server APK"
+            adb install ./node_modules/appium-uiautomator2-driver/apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server APK"
 
             echo "Granting necessary permissions..."
             adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
