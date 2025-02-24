@@ -123,7 +123,7 @@ jobs:
             adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
             echo "Stopping any existing appium processes"
-            pkill -f appium
+            pgrep -f appium && kill -9 $(pgrep -f appium) || echo "No appium process found"
 
             echo "Starting appium server"
             appium --base-path /wd/hub --log appium.log &
