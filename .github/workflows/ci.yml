@@ -101,7 +101,7 @@ jobs:
           api-level: 34
           arch: x86_64
           script: |
-          
+
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
 
@@ -120,34 +120,8 @@ jobs:
             echo "Installing UiAutomator2 server test APK"
             adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
-
-            echo "Granting necessary permissions..."
-            adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
-            adb shell pm grant io.appium.android.setting android.permissions.WRITE_SECURE_SETTINGS
-            adb shell pm grant io.appium.android.setting android.permissions.CHANGE_CONFIGURATION
-            adb shell pm grant io.appium.android.setting android.permissions.READ_PHONE_STATE
-            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
-
             echo "Starting appium server"
             appium --base-path /wd/hub --log appium.log &
-
-            echo "Waiting for Appium server to be available"
-            MAX_RETRIES=10
-            RETRY_DELAY=5
-
-            for i in $(seq 1 $MAX_RETRIES); do
-              if curl --silent --fail http://127.0.0.1:4723/wd/hub/status; then
-                echo "Appium server is up"
-                break
-              fi
-              echo "Waiting for Appium to be ready...retry $i/$MAX_RETRIES"
-              sleep $RETRY_DELAY
-            done
-
-            if ! curl --silent --fail http://127.0.0.1:4723/wd/hub/status; then
-              echo "Appium server did not start in time"
-              exit 1
-            fi
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
