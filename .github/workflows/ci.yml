@@ -126,12 +126,6 @@ jobs:
             adb shell pm grant io.appium.android.setting android.permissions.READ_PHONE_STATE
             adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
 
-            echo "Waiting for emulator to be fully ready"
-            sleep 30
-
-            echo "Checking appium server status"
-            curl http://127.0.0.1:4723/wd/hub/status
-
             echo "Starting appium server"
             appium --base-path /wd/hub --log appium.log &
 
