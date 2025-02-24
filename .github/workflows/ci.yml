@@ -109,16 +109,11 @@ jobs:
             chmod +x node_modules/.bin/wdio 
             
             echo "Waiting for emulator to fully boot"
-            until [ "$(adb shell getprop sys.boot_completed 2>/dev/null)" == "1" ]; do
-              sleep 1
-            done
+            adb wait-for-device
+            sleep 10
 
-            echo "Emulator boot completed. Checking devices"
-            adb devices
-            if ! adb devices | grep -q "device"; then
-              echo "Emulator not found, exiting"
-              exit 1
-            fi
+            echo "Checking if emulator is available"
+            adb devices | grep "device" || (echo "Emulator not found, exiting..." && exit 1)
 
             echo "Installing Appium settings APK"
             adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
@@ -134,9 +129,7 @@ jobs:
             appium --base-path /wd/hub --log appium.log &
 
             echo "Waiting for Appium server to start"
-            until nc -z localhost 4723; do
-              sleep 1
-            done
+            sleep 10
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
