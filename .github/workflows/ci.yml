@@ -109,9 +109,16 @@ jobs:
             chmod +x node_modules/.bin/wdio 
             
             echo "Waiting for emulator to fully boot"
-            adb wait-for-device
-            adb shell getprop initsvc.bootmain
+            until adb shell getprop sys.boot_completed | grep -m 1 "1"; do
+              sleep 1
+            done
+
+            echo "Emulator boot completed. Checking devices"
             adb devices
+            if ! adb devices | grep -q "device"; then
+              echo "Emulator not found, exiting"
+              exit 1
+            fi
 
             echo "Installing Appium settings APK"
             adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
@@ -120,8 +127,16 @@ jobs:
             echo "Installing UiAutomator2 server test APK"
             adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
+            echo "Stopping any existing appium processes"
+            pkill -f appium
+
             echo "Starting appium server"
             appium --base-path /wd/hub --log appium.log &
+
+            echo "Waiting for Appium server to start"
+            until nc -z localhost 4723; do
+              sleep 1
+            done
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
