@@ -99,7 +99,7 @@ jobs:
           adb install $(npm root -g)/appium/node_modules/appium-uiautomator2-driver/apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server APK"
       
       - name: Grant Necessary Permissions
-      - run: |
+        run: |
           adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
           adb shell pm grant io.appium.android.setting android.permissions.WRITE_SECURE_SETTINGS
           adb shell pm grant io.appium.android.setting android.permissions.CHANGE_CONFIGURATION
@@ -107,7 +107,7 @@ jobs:
           adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
 
       - name: Start appium server
-      - run: |
+        run: |
           echo "Starting appium server"
           appium --base-path /wd/hub --log appium.log &
 
