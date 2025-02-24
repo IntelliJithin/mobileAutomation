@@ -102,6 +102,8 @@ jobs:
           arch: x86_64
           script: |
 
+            emulator -avd pixel_x86_64 -gpu off -no-window -no-snapshot-load -memory 4096 &
+            
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
 
