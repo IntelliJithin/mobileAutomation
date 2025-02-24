@@ -103,7 +103,7 @@ jobs:
           script: |
 
             emulator -avd pixel_x86_64 -gpu off -no-window -no-snapshot-load -memory 4096 &
-            
+
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
 
@@ -132,6 +132,24 @@ jobs:
 
             echo "Starting appium server"
             appium --base-path /wd/hub --log appium.log &
+
+            echo "Waiting for Appium server to be available"
+            MAX_RETRIES=10
+            RETRY_DELAY=5
+
+            for i in $(seq 1 $MAX_RETRIES); do
+              if curl --silent --fail http://127.0.0.1:4723/wd/hub/status; then
+                echo "Appium server is up"
+                break
+              fi
+              echo "Waiting for Appium to be ready...retry $i/$MAX_RETRIES"
+              sleep $RETRY_DELAY
+            done
+
+            if ! curl --silent --fail http://127.0.0.1:4723/wd/hub/status; then
+              echo "Appium server did not start in time"
+              exit 1
+            fi
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
