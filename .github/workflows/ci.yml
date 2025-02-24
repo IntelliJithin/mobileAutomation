@@ -99,28 +99,25 @@ jobs:
           api-level: 34
           arch: x86_64
           script: |
+
+            echo "Setting APK permissions"
+            chmod 644 downloaded_apks/*.apk
+
+            echo "Fixing WebDriverIO permissions"
+            chmod +x node_modules/.bin/wdio 
+            
             echo "Waiting for emulator to fully boot"
             adb wait-for-device
             adb shell getprop initsvc.bootmain
             adb devices
 
-            export DOWNLOAD_DIR="/home/runner/work/mobileAutomation/mobileAutomation"
-            echo "DOWNLOAD_DIR is: $DOWNLOAD_DIR"
-
-            mkdir -p "$DOWNLOAD_DIR"
-
-            echo "Downloading Appium setting APK"
-            curl -L -o $DOWNLOAD_DIR/settings_apk-debug.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/settings_apk-debug.apk
-            echo "Downloading UiAutomator2 Server APK"
-            curl -L -o $DOWNLOAD_DIR/appium-uiautomator-server-v7.2.3.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/appium-uiautomator2-server-v7.2.3.apk
-
-            chmod +x $DOWNLOAD_DIR/settings_apk-debug
-            chmod +x $DOWNLOAD_DIR/appium-uiautomator2-server-v7.2.3.apk
-
             echo "Installing Appium settings APK"
-            adb install $DOWNLOAD_DIR/settings_apk_debug.apk || echo "Failed to install setting apk"
+            adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
             echo "Installing UiAutomator2 server APK"
-            adb install $DOWNLOAD_DIR/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server APK"
+            adb install downloaded_apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server"
+            echo "Installing UiAutomator2 server test APK"
+            adb install downloaded_apks/appium-uiautomator2-server-debug.androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
+
 
             echo "Granting necessary permissions..."
             adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
