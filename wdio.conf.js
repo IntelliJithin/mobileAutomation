@@ -64,8 +64,8 @@ export const config = {
         'appium:automationName': 'UIAutomator2',
         'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk'),
         'appium:waitforTimeout': 30000,
-        'connectionRetryTimeout': 30000,
-        'connectionRetryCount': 3
+        'appium:connectionRetryTimeout': 30000,
+        'appium:connectionRetryCount': 3
     }],
 
     //
