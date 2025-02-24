@@ -90,9 +90,6 @@ jobs:
           ls -la $ANDROID_HOME/system-images/android-34
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
-
-      - name: Install netcat
-        run: sudo apt-get install -y netcat
           
 
       - name: Start android emulator and run test
