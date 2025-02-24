@@ -90,6 +90,9 @@ jobs:
           ls -la $ANDROID_HOME/system-images/android-34
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
+
+      - name: Install netcat
+        run: sudo apt-get install -y netcat
           
 
       - name: Start android emulator and run test
@@ -109,7 +112,7 @@ jobs:
             chmod +x node_modules/.bin/wdio 
             
             echo "Waiting for emulator to fully boot"
-            until adb shell getprop sys.boot_completed | grep -m 1 "1"; do
+            until [ "$(adb shell getprop sys.boot_completed 2>/dev/null)" == "1" ]; do
               sleep 1
             done
 
