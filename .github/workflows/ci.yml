@@ -106,7 +106,9 @@ jobs:
 
             DOWNLOAD_DIR="/home/runner/work/mobileAutomation/mobileAutomation"
 
-            mkdir -p $DOWNLOAD_DIR
+            echo "DOWNLOAD_DIR is: $DOWNLOAD_DIR"
+            mkdir -p "$DOWNLOAD_DIR"
+            echo "Directory created: $DIRECTORY_DIR"
 
             echo "Downloading Appium setting APK"
             curl -L -o $DOWNLOAD_DIR/settings_apk-debug.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/settings_apk-debug.apk
