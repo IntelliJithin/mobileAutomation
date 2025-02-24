@@ -103,19 +103,21 @@ jobs:
             adb shell getprop initsvc.bootmain
             adb devices
 
+            DOWNLOAD_DIR="/home/runner/work/mobileAutomation/mobileAutomation"
+
             echo "Downloading Appium setting APK"
-            curl -L -o settings_apk-debug.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/settings_apk-debug.apk
+            curl -L -o $DOWNLOAD_DIR/settings_apk-debug.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/settings_apk-debug.apk
             echo "Downloading UiAutomator2 Server APK"
-            curl -L -o appium-uiautomator-server-v7.2.3.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/appium-uiautomator2-server-v7.2.3.apk
+            curl -L -o $DOWNLOAD_DIR/appium-uiautomator-server-v7.2.3.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/appium-uiautomator2-server-v7.2.3.apk
 
             echo "Current directory is: $(pwd)"
             echo "List files in current directory"
-            ls -l
+            ls -l $DOWNLOAD_DIR
 
             echo "Installing Appium settings APK"
-            adb install $(pwd)/settings_apk_debug.apk || echo "Failed to install setting apk"
+            adb install $DOWNLOAD_DIR/settings_apk_debug.apk || echo "Failed to install setting apk"
             echo "Installing UiAutomator2 server APK"
-            adb install $(pwd)/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server APK"
+            adb install $DOWNLOAD_DIR/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server APK"
 
             echo "Granting necessary permissions..."
             adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
