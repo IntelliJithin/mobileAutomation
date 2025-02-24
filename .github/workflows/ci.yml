@@ -97,7 +97,22 @@ jobs:
         with: 
           api-level: 34
           arch: x86_64
-          script: npx wdio wdio.conf.js
+          script: |
+            echo "Installing appium settings APK"
+            adb install -r $(npm root -g)/appium/node_modules/appium-uiautomator2-driver/apks/settings_apk-debug.apk || echo "Failed to install setting apk"
+
+            echo "Granting necessary permissions"
+            adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
+            adb shell pm grant io.appium.android.setting android.permissions.WRITE_SECURE_SETTINGS
+            adb shell pm grant io.appium.android.setting android.permissions.CHANGE_CONFIGURATION
+            adb shell pm grant io.appium.android.setting android.permissions.READ_PHONE_STATE
+            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
+
+            echo "Starting Appium server"
+            appium --base-path /wd/hub --log appium.log &
+            
+            echo "Emulator and Appium are ready. Running tests now..."
+            npx wdio wdio.conf.js
  
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
