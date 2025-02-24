@@ -90,7 +90,27 @@ jobs:
           ls -la $ANDROID_HOME/system-images/android-34
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
- 
+
+      -  name: Install missing APKs
+         run: |
+          echo "Installing Appium settings APK"
+          adb install $(npm root -g)/appium/node_modules/appium-uiautomator2-driver/apks/settings_apk_debug.apk || echo "Failed to install setting apk"
+          echo "Installing UiAutomator2 server APK"
+          adb install $(npm root -g)/appium/node_modules/appium-uiautomator2-driver/apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server APK"
+      
+      - name: Grant Necessary Permissions
+      - run: |
+          adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
+          adb shell pm grant io.appium.android.setting android.permissions.WRITE_SECURE_SETTINGS
+          adb shell pm grant io.appium.android.setting android.permissions.CHANGE_CONFIGURATION
+          adb shell pm grant io.appium.android.setting android.permissions.READ_PHONE_STATE
+          adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
+
+      - name: Start appium server
+      - run: |
+          echo "Starting appium server"
+          appium --base-path /wd/hub --log appium.log &
+
       - name: Start android emulator and run test
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 30
@@ -98,20 +118,11 @@ jobs:
           api-level: 34
           arch: x86_64
           script: |
-            echo "Installing appium settings APK"
-            adb install -r $(npm root -g)/appium/node_modules/appium-uiautomator2-driver/apks/settings_apk-debug.apk || echo "Failed to install setting apk"
-
-            echo "Granting necessary permissions"
-            adb shell pm grant io.appium.android.setting android.permissions.SETTINGS
-            adb shell pm grant io.appium.android.setting android.permissions.WRITE_SECURE_SETTINGS
-            adb shell pm grant io.appium.android.setting android.permissions.CHANGE_CONFIGURATION
-            adb shell pm grant io.appium.android.setting android.permissions.READ_PHONE_STATE
-            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
-
-            echo "Starting Appium server"
-            appium --base-path /wd/hub --log appium.log &
-            
-            echo "Emulator and Appium are ready. Running tests now..."
+            echo "Waiting for emulator to fully boot"
+            adb wait-for-device
+            adb shell getprop initsvc.bootmain
+            adb devices
+            echo "Running tests now..."
             npx wdio wdio.conf.js
  
       - name: 📦 Upload Logs
