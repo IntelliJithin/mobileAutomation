@@ -104,19 +104,15 @@ jobs:
             adb shell getprop initsvc.bootmain
             adb devices
 
-            DOWNLOAD_DIR="/home/runner/work/mobileAutomation/mobileAutomation"
-
+            export DOWNLOAD_DIR="/home/runner/work/mobileAutomation/mobileAutomation"
             echo "DOWNLOAD_DIR is: $DOWNLOAD_DIR"
+
             mkdir -p "$DOWNLOAD_DIR"
-            echo "Directory created: $DIRECTORY_DIR"
 
             echo "Downloading Appium setting APK"
             curl -L -o $DOWNLOAD_DIR/settings_apk-debug.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/settings_apk-debug.apk
             echo "Downloading UiAutomator2 Server APK"
             curl -L -o $DOWNLOAD_DIR/appium-uiautomator-server-v7.2.3.apk https://github.com/appium-uiautomator2-driver/releases/download/v7.2.3/appium-uiautomator2-server-v7.2.3.apk
-
-            echo "List files in current directory"
-            ls -l $DOWNLOAD_DIR
 
             chmod +x $DOWNLOAD_DIR/settings_apk-debug
             chmod +x $DOWNLOAD_DIR/appium-uiautomator2-server-v7.2.3.apk
