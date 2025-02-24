@@ -62,11 +62,7 @@ export const config = {
         'appium:platformVersion': '14.0',
         'appium:deviceName': 'pixel',
         'appium:automationName': 'UIAutomator2',
-        'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk'),
-        'appium:newCommandTimeout': 300,
-        'appium:connectHardwareDevicesTimeout': 60000,
-        'appium:deviceReadyTimeout': 120000,
-        'apium:appWaitDuration': 60000
+        'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk')
     }],
 
     //
