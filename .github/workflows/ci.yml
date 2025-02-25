@@ -139,7 +139,7 @@ jobs:
             nc -z localhost 4723 || (eccho "Appium server not started, exiting..." && exit 1)
             
             echo "Manually starting UiAutomator2..."
-            adb shell am instrument -w -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
+            adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
