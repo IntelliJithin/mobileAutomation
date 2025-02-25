@@ -148,7 +148,7 @@ jobs:
             pkill -f "adb logcat"
 
             echo "Checking uiautomator2 logs"
-            cat uiautomator2_log.txt | grep -i "uiautomator"
+            adb logcat -d | grep -i "uiautomator"
  
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
