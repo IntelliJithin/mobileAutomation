@@ -20,10 +20,21 @@ jobs:
 
       - name: Install Android SDK and Emulator
         run: |
-          echo "Installing Android SDK"
-          yes | sdkmanager --licenses
-          sdkmanager --install 'build-tools;30.0.3' 'platform-tools' 'platforms;android-34' 'system-images;android-34;default;x86' 'emulator' || exit 1
-          echo "SDK and Emulator installed"
+          echo "Setting up Android SDK..."
+          # Install required dependencies
+          sudo apt update -y
+          sudo apt install -y wget unzip openjdk-8-jdk
+          # Download and set up Android SDK
+          wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip -P $HOME
+          unzip $HOME/commandlinetools-linux-7302050_latest.zip -d $HOME/android-sdk
+          rm $HOME/commandlinetools-linux-7302050_latest.zip
+          # Set environment variable
+          echo "export ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "export PATH=$ANDROID_SDK_ROOT/cmdline-tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
+          # Accept SDK licenses
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --licenses
+          # Install required SDK components
+          $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --install 'build-tools;30.0.3' 'platform-tools' 'platforms;android-34' 'system-images;android-34;default;x86' 'emulator'
 
       - name: Setup Appium
         run: |
