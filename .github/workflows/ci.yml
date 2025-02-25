@@ -101,7 +101,7 @@ jobs:
           api-level: 34
           arch: x86_64
           script: |
-            bash -c "echo 'Setting APK permissions'
+            echo 'Setting APK permissions'
             chmod 644 downloaded_apks/*.apk
 
             echo 'Fixing WebDriverIO permissions'
@@ -150,7 +150,7 @@ jobs:
             pkill -f 'adb logcat'
 
             echo 'Checking uiautomator2 logs'
-            cat uiautomator2_log.txt | grep -i 'uiautomator'"
+            cat uiautomator2_log.txt | grep -i 'uiautomator'
  
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
