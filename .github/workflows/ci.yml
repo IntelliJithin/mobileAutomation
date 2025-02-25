@@ -152,6 +152,7 @@ jobs:
                 break
               fi
               echo "Waiting for Appium to be ready"
+              COUNT=$((COUNT + 1))
               sleep 3
             done
             
