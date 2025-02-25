@@ -18,6 +18,13 @@ jobs:
       - name: Install dependecies
         run: npm install
 
+      - name: Install Android SDK and Emulator
+        run: |
+          echo "Installing Android SDK"
+          yes | sdkmanager --licenses
+          sdkmanager --install 'build-tools;30.0.3' 'platform-tools' 'platforms;android-34' 'system-images;android-34;default;x86' 'emulator' || exit 1
+          echo "SDK and Emulator installed"
+
       - name: Setup Appium
         run: |
           npm install -g appium@v1.22
