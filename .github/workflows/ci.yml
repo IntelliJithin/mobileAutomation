@@ -122,11 +122,7 @@ jobs:
             echo "Installing UiAutomator2 server test APK"
             adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
-            echo "Starting appium server"
-            appium --base-path /wd/hub --log appium.log &
-
-            echo "Waiting for Appium server to start"
-            sleep 10
+            adb shell ps | grep uiautomator
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
