@@ -109,11 +109,12 @@ jobs:
             chmod +x node_modules/.bin/wdio 
             
             echo "Waiting for emulator to fully boot"
-            adb wait-for-device
-            sleep 10
+            until adb shell getprop sys.boot_completed | grep -m 1 "1"; do
+              sleep 1
+            done
 
-            echo "Checking if emulator is available"
-            adb devices | grep "device" || (echo "Emulator not found, exiting..." && exit 1)
+            echo "Emulator boot completed. Checking devices..."
+            adb devices
 
             echo "Installing Appium settings APK"
             adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
@@ -131,6 +132,14 @@ jobs:
 
             echo "Starting logcat to capture logs"
             adb logcat -s UiAutomator2 > uiautomator2_log.txt 2>&1 &
+
+            echo "Starting Appium server"
+            appium --base-path /wd/hub --log appium.log &
+
+            echo "Waiting for Appium server to start"
+            until nc -z localhost 4723; do
+              sleep 1
+            done
             
             echo "Manually starting UiAutomator2..."
             adb shell am instrument -w -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
