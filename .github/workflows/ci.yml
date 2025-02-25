@@ -67,17 +67,17 @@ jobs:
  
          echo "📌 Verifying sdkmanager existence..."
          if [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-         echo "✅ sdkmanager found!"
+            echo "✅ sdkmanager found!"
          else
-         echo "❌ ERROR: sdkmanager not found!"
-         exit 1
+            echo "❌ ERROR: sdkmanager not found!"
+            exit 1
          fi
  
          echo "✅ Accepting licenses..."
          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || echo "⚠️ License acceptance failed"
  
          echo "📥 Installing required SDK packages..."
-         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "build-tools;30.0.0" "platforms;android-30" "system-images;android-30;google_apis;x86"
+         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "build-tools;30.0.3" "platforms;android-30" "system-images;android-30;google_apis;x86_64"
  
          echo "📌 Listing installed SDK components..."
          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list 
@@ -98,7 +98,7 @@ jobs:
           ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
         with: 
           api-level: 30
-          arch: x86
+          arch: x86_64
           script: |
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
