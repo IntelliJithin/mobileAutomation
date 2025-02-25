@@ -101,56 +101,54 @@ jobs:
           api-level: 34
           arch: x86_64
           script: |
-            echo 'Setting APK permissions'
+
+            echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
 
-            echo 'Fixing WebDriverIO permissions'
+            echo "Fixing WebDriverIO permissions"
             chmod +x node_modules/.bin/wdio 
             
-            echo 'Waiting for emulator to fully boot'
-            until adb shell getprop sys.boot_completed | grep -m 1 '1'; do
-              sleep 1
-            done
+            echo "Waiting for emulator to fully boot"
+            adb wait-for-device
+            adb shell getprop sys.boot_completed | grep -m 1 "1"
 
-            echo 'Emulator boot completed. Checking devices...''
+            echo "Emulator boot completed. Checking devices..."
             adb devices
 
-            echo 'Installing Appium settings APK'
-            adb install downloaded_apks/settings_apk-debug.apk || echo 'Failed to install setting apk'
-            echo 'Installing UiAutomator2 server APK'
-            adb install downloaded_apks/appium-uiautomator2-server-v7.2.3.apk || echo 'Failed to install UiAutomator2 Server'
-            echo 'Installing UiAutomator2 server test APK'
-            adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo 'Failed to install UiAutomator2 Server Test'
+            echo "Installing Appium settings APK"
+            adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
+            echo "Installing UiAutomator2 server APK"
+            adb install downloaded_apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server"
+            echo "Installing UiAutomator2 server test APK"
+            adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
-            echo 'Granting necessary permissions'
+            echo "Granting necessary permissions"
             adb shell pm grant io.appium.android.setting android.permission.SETTINGS
             adb shell pm grant io.appium.android.setting android.permission.WRITE_SECURE_SETTINGS
             adb shell pm grant io.appium.android.setting android.permission.CHANGE_CONFIGURATION
             adb shell pm grant io.appium.android.setting android.permission.READ_PHONE_STATE
-            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo 'Failed to enable WiFi'
+            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
 
-            echo 'Starting logcat to capture logs'
+            echo "Starting logcat to capture logs"
             adb logcat -s UiAutomator2 > uiautomator2_log.txt 2>&1 &
 
-            echo 'Starting Appium server'
+            echo "Starting Appium server"
             appium --base-path /wd/hub --log appium.log &
 
-            echo 'Waiting for Appium server to start'
-            until nc -z localhost 4723; do
-              sleep 1
-            done
+            echo "Waiting for Appium server to start"
+            nc -z localhost 4723 || (eccho "Appium server not started, exiting..." && exit 1)
             
-            echo 'Manually starting UiAutomator2...'
+            echo "Manually starting UiAutomator2..."
             adb shell am instrument -w -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
 
-            echo 'Running tests now...'
+            echo "Running tests now..."
             npx wdio wdio.conf.js
 
-            echo 'Stopping logcat'
-            pkill -f 'adb logcat'
+            echo "Stopping logcat"
+            pkill -f "adb logcat"
 
-            echo 'Checking uiautomator2 logs'
-            cat uiautomator2_log.txt | grep -i 'uiautomator'
+            echo "Checking uiautomator2 logs"
+            cat uiautomator2_log.txt | grep -i "uiautomator"
  
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
