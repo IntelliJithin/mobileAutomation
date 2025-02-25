@@ -130,7 +130,7 @@ jobs:
             adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
 
             echo "Starting logcat to capture logs"
-            adb logcat -s UiAutomator2 > uiautomator2_log.txt 2>&1 &
+            adb logcat -s UiAutomator2 &
 
             echo "Starting Appium server"
             appium --base-path /wd/hub --log appium.log &
@@ -154,5 +154,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: uiautomator2-logs
-          path: uiautomator2_log.txt
+          name: logs
+          path: logs
