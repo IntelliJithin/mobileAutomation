@@ -129,18 +129,49 @@ jobs:
             adb shell pm grant io.appium.android.setting android.permission.READ_PHONE_STATE
             adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
 
+            echo "Checking emulator state"
+            adb get-state
+            adb shell getprop sys.boot_completed
+            adb shell dumpsys window | grep "mCurrentFocus" || echo "No active window detected"
+            
             echo "Starting logcat to capture logs"
             adb logcat -s UiAutomator2 &
 
             echo "Starting Appium server"
-            appium --base-path /wd/hub --log appium.log &
+            appium --base-path /wd/hub --log appium.log & echo $! > appium_pid
+            sleep 10
 
-            echo "Waiting for Appium server to start"
-            nc -z localhost 4723 || (eccho "Appium server not started, exiting..." && exit 1)
+            echo "Checking Appium server status"
+            for i in {1..10}; do
+              APP_STATUS=$(curl -s http://127.0.0.1:4723/wd/hub/status | jq -r '.status')
+              echo "Appium status: $APP_STATUS"
+              if [ "$APP_STATUS" = "0" ]; then
+                echo "Appium is ready"
+                break
+              fi
+              echo "Waiting for Appium to be ready"
+              sleep 3
+            done
+            
+            echo "Verifying if Appium is still running"
+            if ! ps -p $(cat appium_pid) > /dev/null; then
+              echo "Appium crashed"
+              exit 1
+            fi
+            
+            echo "Checking if UiAutomator2 is running"
+            adb shell ps | grep uiautomator || echo "UiAutomator2 is NOT running before manual start"
             
             echo "Manually starting UiAutomator2..."
-            adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
+            adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner || echo "Failed to start uiautomator2"
 
+            echo "Checking UiAutomator2 process"
+            adb shell ps | grep uiautomator || echo "UiAutomator2 is NOT running after manual start"
+            
+            echo "Verifying appium session port"
+            APP_PORT=$(lsof -i -P | grep LISTEN | grep node | awk '{print $9}' | cut -d':' -f2)
+            echo "Appium is listening on port: $APP_PORT"
+            
             echo "Running tests now..."
             npx wdio wdio.conf.js
 
