@@ -102,6 +102,7 @@ jobs:
           arch: x86_64
           script: |
 
+            #!/bin/bash
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
 
