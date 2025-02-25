@@ -122,16 +122,31 @@ jobs:
             echo "Installing UiAutomator2 server test APK"
             adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
+            echo "Granting necessary permissions"
+            adb shell pm grant io.appium.android.setting android.permission.SETTINGS
+            adb shell pm grant io.appium.android.setting android.permission.WRITE_SECURE_SETTINGS
+            adb shell pm grant io.appium.android.setting android.permission.CHANGE_CONFIGURATION
+            adb shell pm grant io.appium.android.setting android.permission.READ_PHONE_STATE
+            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
+
+            echo "Starting logcat to capture logs"
+            adb logcat -s UiAutomator2 > uiautomator2_log.txt 2>&1 &
+            
+            echo "Manually starting UiAutomator2..."
             adb shell am instrument -w -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
-            adb logcat -s UiAutomator2
-            adb shell ps | grep uiautomator
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
+
+            echo "Stopping logcat"
+            pkill -f "adb logcat"
+
+            echo "Checking uiautomator2 logs"
+            cat uiautomator2_log.txt | grep -i "uiautomator"
  
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: logs
-          path: logs
+          name: uiautomator2-logs
+          path: uiautomator2_log.txt
