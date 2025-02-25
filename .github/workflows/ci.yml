@@ -101,8 +101,7 @@ jobs:
           api-level: 34
           arch: x86_64
           script: |
-
-          
+            bash -c '
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
 
@@ -110,11 +109,9 @@ jobs:
             chmod +x node_modules/.bin/wdio 
             
             echo "Waiting for emulator to fully boot"
-            bash -c '
-              until adb shell getprop sys.boot_completed | grep -m 1 "1"; do
-                sleep 1
-              done
-            '
+            until adb shell getprop sys.boot_completed | grep -m 1 "1"; do
+              sleep 1
+            done
 
             echo "Emulator boot completed. Checking devices..."
             adb devices
@@ -155,6 +152,7 @@ jobs:
 
             echo "Checking uiautomator2 logs"
             cat uiautomator2_log.txt | grep -i "uiautomator"
+            '
  
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
