@@ -123,6 +123,7 @@ jobs:
             adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
 
             adb shell am instrument -w -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
+            adb logcat -s UiAutomator2
             adb shell ps | grep uiautomator
 
             echo "Running tests now..."
