@@ -142,7 +142,9 @@ jobs:
             sleep 10
 
             echo "Checking Appium server status"
-            for i in {1..10}; do
+            COUNT=0
+            MAX_RETRIES=10
+            while [ $COUNT -lt $MAX_RETRIES ]; do
               APP_STATUS=$(curl -s http://127.0.0.1:4723/wd/hub/status | jq -r '.status')
               echo "Appium status: $APP_STATUS"
               if [ "$APP_STATUS" = "0" ]; then
