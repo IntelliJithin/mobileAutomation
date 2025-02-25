@@ -1,192 +1,32 @@
 name: Mobile automation test
- 
-on:
-  workflow_dispatch:
- 
+
+on: workflow_dispatch
+
 jobs:
   build:
     runs-on: ubuntu-latest
- 
-    steps:
-      - name: ⬇️ Checkout Code
+
+    steps: 
+      - name: Checkout code
         uses: actions/checkout@v4
- 
-      - name: 🐢 Setup Node
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
- 
-      - name: Clean node_modules and package-lock.json
-        run: |
-          rm -rf node_modules
-          rm package-lock.json
-          npm install # Reinstall dependencies cleanly
- 
-      - name: 🏗️ Install Dependencies
+      
+      - name: Install dependecies
         run: npm install
- 
-      - name: Install Appium and drivers
-        run: |
-          echo "Checking currently installed Appium driver..."
-          if ! command -v appium &> /dev/null; then
-           echo "Appium not found. Installing..."
-           npm install -g appium
-          fi
-          
-          INSTALLED_DRIVERS=$(appium driver list --installed 2>&1 || echo "Error: Appium command failed")
-          if echo "$INSTALLED_DRIVERS" | grep -q "uiautomator2"; then
-           echo "uiautomator2 is already installed. Skipping reinstallation."
-          else
-           echo "uiautomator2 not found. Reinstalling Appium and drivers..."
-           appium driver install uiautomator2
-          fi
-                    
-      - name: Install Java
-        run: sudo apt-get install -y openjdk-11-jdk
- 
-      - name: Install Android SDK and Setup Path
-        run: |
-         echo "📥 Installing Android SDK & dependencies..."
-         sudo apt-get update
-         sudo apt-get install -y wget unzip
- 
-         echo "📥 Downloading Android command-line tools..."
-         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
- 
-         echo "📂 Extracting Android command-line tools..."
-         mkdir -p $HOME/android-sdk/cmdline-tools
-         unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
-         mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
- 
-         echo "🔧 Setting environment variables..."
-         echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-         echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH" >> $GITHUB_ENV
- 
-         # Reload the environment variables
-         source $GITHUB_ENV
- 
-         echo "📌 Verifying sdkmanager existence..."
-         if [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-         echo "✅ sdkmanager found!"
-         else
-         echo "❌ ERROR: sdkmanager not found!"
-         exit 1
-         fi
- 
-         echo "✅ Accepting licenses..."
-         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || echo "⚠️ License acceptance failed"
- 
-         echo "📥 Installing required SDK packages..."
-         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "build-tools;34.0.0" "platforms;android-34" "system-images;android-34;google_apis;x86_64"
- 
-         echo "📌 Listing installed SDK components..."
-         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list 
 
-      - name: Verify SDK Installation
+      - name: Setup Appium
         run: |
-          echo "Checking Android SDK paths..."
-          ls -la $ANDROID_HOME
-          ls -la $ANDROID_HOME/platforms
-          ls -la $ANDROID_HOME/system-images/android-34
-          echo "Checking available SDK packages..."
-          sdkmanager --list || echo "sdkmanager command failed"
-          
+          npm install -g appium@v1.22
+          appium -v
+          appium &>/dev/null &
 
-      - name: Start android emulator and run test
+      - name: Run appium android test
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 15
-        env:
-          ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
         with: 
           api-level: 34
-          arch: x86_64
-          script: |
-
-            echo "Setting APK permissions"
-            chmod 644 downloaded_apks/*.apk
-
-            echo "Fixing WebDriverIO permissions"
-            chmod +x node_modules/.bin/wdio 
-            
-            echo "Waiting for emulator to fully boot"
-            adb wait-for-device
-            adb shell getprop sys.boot_completed | grep -m 1 "1"
-
-            echo "Emulator boot completed. Checking devices..."
-            adb devices
-
-            echo "Installing Appium settings APK"
-            adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
-            echo "Installing UiAutomator2 server APK"
-            adb install downloaded_apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server"
-            echo "Installing UiAutomator2 server test APK"
-            adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
-
-            echo "Granting necessary permissions"
-            adb shell pm grant io.appium.android.setting android.permission.SETTINGS
-            adb shell pm grant io.appium.android.setting android.permission.WRITE_SECURE_SETTINGS
-            adb shell pm grant io.appium.android.setting android.permission.CHANGE_CONFIGURATION
-            adb shell pm grant io.appium.android.setting android.permission.READ_PHONE_STATE
-            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
-
-            echo "Checking emulator state"
-            adb get-state
-            adb shell getprop sys.boot_completed
-            adb shell dumpsys window | grep "mCurrentFocus" || echo "No active window detected"
-            
-            echo "Starting logcat to capture logs"
-            adb logcat -s UiAutomator2 &
-
-            echo "Starting Appium server"
-            appium --base-path /wd/hub --log appium.log & echo $! > appium_pid
-            sleep 10
-
-            echo "Checking Appium server status"
-            COUNT=0
-            MAX_RETRIES=10
-            while [ $COUNT -lt $MAX_RETRIES ]; do
-              APP_STATUS=$(curl -s http://127.0.0.1:4723/wd/hub/status | jq -r '.status')
-              echo "Appium status: $APP_STATUS"
-              if [ "$APP_STATUS" = "0" ]; then
-                echo "Appium is ready"
-                break
-              fi
-              echo "Waiting for Appium to be ready"
-              COUNT=$((COUNT + 1))
-              sleep 3
-            done
-            
-            echo "Verifying if Appium is still running"
-            if ! ps -p $(cat appium_pid) > /dev/null; then
-              echo "Appium crashed"
-              exit 1
-            fi
-            
-            echo "Checking if UiAutomator2 is running"
-            adb shell ps | grep uiautomator || echo "UiAutomator2 is NOT running before manual start"
-            
-            echo "Manually starting UiAutomator2..."
-            adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner || echo "Failed to start uiautomator2"
-
-            echo "Checking UiAutomator2 process"
-            adb shell ps | grep uiautomator || echo "UiAutomator2 is NOT running after manual start"
-            
-            echo "Verifying appium session port"
-            APP_PORT=$(lsof -i -P | grep LISTEN | grep node | awk '{print $9}' | cut -d':' -f2)
-            echo "Appium is listening on port: $APP_PORT"
-            
-            echo "Running tests now..."
-            npx wdio wdio.conf.js
-
-            echo "Stopping logcat"
-            pkill -f "adb logcat"
-
-            echo "Checking uiautomator2 logs"
-            adb logcat -d | grep -i "uiautomator"
- 
-      - name: 📦 Upload Logs
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: logs
-          path: logs
+          script: npx wdio wdio.conf.js
