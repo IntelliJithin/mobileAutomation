@@ -102,7 +102,7 @@ jobs:
           arch: x86_64
           script: |
 
-            #!/bin/bash
+          
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
 
@@ -110,12 +110,11 @@ jobs:
             chmod +x node_modules/.bin/wdio 
             
             echo "Waiting for emulator to fully boot"
-            adb shell getprop sys.boot_completed
-
-            until [ "$(adb shell getprop sys.boot_completed)" == "1" ]; do
-              echo "Waiting for emulator to complete boot"
-              sleep 1
-            done
+            bash -c '
+              until adb shell getprop sys.boot_completed | grep -m 1 "1"; do
+                sleep 1
+              done
+            '
 
             echo "Emulator boot completed. Checking devices..."
             adb devices
