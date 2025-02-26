@@ -8,7 +8,8 @@ describe('Input text', () => {
         await viewsElement.waitForDisplayed({timeout:50000});
         await viewsElement.click();
         } catch (error) {
-            await browser.saveScreenshot('./error_screenshot_views.png');
+            const screenshot = await browser.takeScreenshot;
+            fs.writeFileSync('./error_screenshot_views.png', screenshot, 'base64');
             throw error;
         }
         await browser.pause(5000);
@@ -21,7 +22,8 @@ describe('Input text', () => {
         await autoCompleteElement.waitForDisplayed({timeout:50000});
         await autoCompleteElement.click();
         } catch (error) {
-            await browser.saveScreenshot('./error_Screenshot_auto_complete.png');
+            const screenshot = await browser.takeScreenshot;
+            fs.writeFileSync('./error_Screenshot_auto_complete.png', screenshot, 'base64');
             throw error;
         }
         await browser.pause(5000);
