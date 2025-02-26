@@ -1,4 +1,5 @@
 import {$, browser} from "@wdio/globals";
+import fs from 'fs';
 
 describe('Input text', () => {
     it('Click Views', async() => {
