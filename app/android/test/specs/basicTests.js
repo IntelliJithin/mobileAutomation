@@ -2,13 +2,17 @@ import {$, browser} from "@wdio/globals";
 
 describe('Input text', () => {
     it('Click Views', async() => {
-        await $('~Views').click();
-        await browser.pause(5000);
+        const viewsElement = $('~Views');
+        await viewsElement.waitForExist({timeout:10000});
+        await viewsElement.waitForDisplayed({timeout:10000});
+        await viewsElement.click();
     });
 
     it('Click Auto Complete', async() => {
-        await $('~Auto Complete').click();
-        await browser.pause(5000);
+        const autoCompleteElement = $('~Auto Complete');
+        await autoCompleteElement.waitForExist({timeout:10000});
+        await autoCompleteElement.waitForDisplayed({timeout:10000});
+        await autoCompleteElement.click();
     });
 
 })
