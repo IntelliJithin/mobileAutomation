@@ -90,10 +90,17 @@ jobs:
           ls -la $ANDROID_HOME/system-images/android-30
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
+
+      - name: Set up Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          export DISPLAY=:99.0
+          Xvfb :99 -ac &
           
       - name: Start android emulator and run test
         uses: reactivecircus/android-emulator-runner@v2
-        timeout-minutes: 30
+        timeout-minutes: 20
         env:
           ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
         with: 
