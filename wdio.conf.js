@@ -65,7 +65,8 @@ export const config = {
         'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk'),
         'appium:waitforTimeout': 30000,
         'appium:connectionRetryTimeout': 30000,
-        'appium:connectionRetryCount': 3
+        'appium:connectionRetryCount': 3,
+        'appium:autoDismissAlerts': true
     }],
 
     //
