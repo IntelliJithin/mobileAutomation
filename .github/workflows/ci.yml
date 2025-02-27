@@ -160,4 +160,4 @@ jobs:
         if: always()
         with:
           name: logs
-          path: logs
+          path: ./log.txt

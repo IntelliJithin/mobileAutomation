@@ -19,6 +19,10 @@ async function handleANRDialogs() {
 
 describe('Input text', () => {
     it('Click Views', async() => {
+
+        beforeEach(async () => {
+            await handleANRDialogs();
+        })
         try {
         await handleANRDialogs();
         const viewsElement = $('~Views');
@@ -34,7 +38,6 @@ describe('Input text', () => {
 
     it('Click Auto Complete', async() => {
         try{
-        await handleANRDialogs();
         const autoCompleteElement = $('~Auto Complete');
         await autoCompleteElement.waitForExist({timeout:50000, interval: 500});
         await autoCompleteElement.waitForDisplayed({timeout:50000});
