@@ -90,9 +90,6 @@ jobs:
           ls -la $ANDROID_HOME/system-images/android-30
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
-
-      - name: Create screenshots directory
-        run: mkdir -p ./screenshots    
           
       - name: Start android emulator and run test
         uses: reactivecircus/android-emulator-runner@v2
@@ -141,7 +138,7 @@ jobs:
             
             echo "Manually starting UiAutomator2..."
             adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
-            
+
             echo "Running tests now..."
             npx wdio wdio.conf.js
            
@@ -156,7 +153,7 @@ jobs:
         if: always()
         with: 
           name: screenshots
-          path: ./screenshots/*.png
+          path: ./error_screenshot_*.png
       
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
