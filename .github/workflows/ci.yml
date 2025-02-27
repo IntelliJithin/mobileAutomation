@@ -138,11 +138,6 @@ jobs:
             
             echo "Manually starting UiAutomator2..."
             adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
-           
-            echo "Dump the UI hierarchy"
-            adb shell uiautomator dump
-            echo "Pull the dump to github actions runner"
-            adb pull /sdcard/window_dump.xml .
 
             echo "Running tests now..."
             npx wdio wdio.conf.js
@@ -152,13 +147,6 @@ jobs:
            
             echo "Checking uiautomator2 logs"
             adb logcat -d | grep -i "uiautomator"
- 
-      - name: Upload UI Dump
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: uiautomator-dump
-          path: window_dump.xml
       
       - name: Upload Screenshots
         uses: actions/upload-artifact@v4
