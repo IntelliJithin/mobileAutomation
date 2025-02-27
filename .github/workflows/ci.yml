@@ -157,7 +157,7 @@ jobs:
       
       - name: 📦 Upload Logs
         uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
           name: logs
           path: logs
