@@ -26,7 +26,7 @@ async function handleANRDialogs() {
               await browser.saveScreenshot('./ANR_screenshot_${anrCount}.png');
               logToFile("Screenshot of ANR dialog captured: ANR_screenshot_${anrCount}.png");
 
-              await browser.pause(5000);
+              await browser.pause(10000);
               anrCount++;
             }  else {
                anrDetected = false;
