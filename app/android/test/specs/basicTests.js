@@ -26,16 +26,43 @@ async function handleANRDialogs() {
     }
 }
 
+async function scrollUntilVisible(element) {
+    let maxScrolls = 10;
+    let scrolls = 0;
+
+    while (!(await element.isDisplayed()) && scrolls < maxScrolls) {
+        logToFile('Scrolling to find element.....Attempt ${scrolls + 1}');
+
+        await driver.touchPerform ([
+            { action: "press", options: {x:500, y: 1500} },
+            { action: "moveTo", options: {x:500, y: 500} },
+            { action: "release" },
+        ]);
+
+        await browser.pause(1000);
+        scrolls++;
+    }
+
+    if (await element.isDisplayed()) {
+        logToFile("Element is now visible");
+    } else {
+        logToFile("Element not found after max scroll attempts");
+    }
+    
+}
+
 describe('Input text', () => {
 
     it('Click Views', async() => {
         logToFile("Starting 'Click Views' test");
-
         
         await handleANRDialogs();
         try {
         logToFile("Looking for Views element");
         const viewsElement = $('~Views');
+
+        await scrollUntilVisible(viewsElement);    
+
         await viewsElement.waitForExist({timeout:50000});
         await viewsElement.waitForDisplayed({timeout:50000});
         logToFile("Clicking views");    
