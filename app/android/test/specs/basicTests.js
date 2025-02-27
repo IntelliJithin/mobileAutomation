@@ -12,6 +12,7 @@ logToFile("Test suite started");
 async function handleANRDialogs() {
     try {
         let anrDetected = true;
+        let anrCount = 1;
 
         while (anrDetected) {
             logToFile("Checking for ANR dialog...")
@@ -21,10 +22,15 @@ async function handleANRDialogs() {
               logToFile("ANR detected! Clicking 'Wait'...")
               await waitButton.waitForClickable();
               await waitButton.click();
+
+              await browser.saveScreenshot('./ANR_screenshot_${anrCount}.png');
+              logToFile("Screenshot of ANR dialog captured: ANR_screenshot_${anrCount}.png");
+
               await browser.pause(1000);
+              anrCount++;
             }  else {
-                anrDetected = false;
-                logToFile("No ANR dialog detected");
+               anrDetected = false;
+               logToFile("No ANR dialog detected");
             }
         }
         
@@ -64,7 +70,7 @@ describe('Input text', () => {
         logToFile("Starting 'Click Views' test");
         
         await handleANRDialogs();
-        
+
         try {
         logToFile("Looking for Views element");
         const viewsElement = $('~Views');
