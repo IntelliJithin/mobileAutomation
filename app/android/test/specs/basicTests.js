@@ -1,5 +1,4 @@
 import {$, browser} from "@wdio/globals";
-import { log } from "console";
 import fs from "fs";
 
 
@@ -13,7 +12,7 @@ logToFile("Test suite started");
 async function handleANRDialogs() {
     try {
         logToFile("Checking for ANR dialog...")
-        const waitButton = $('~Wait');
+        const waitButton = $('android=new UiSelector().resourceId("android:id/aerr_wait")');
 
         if (await waitButton.isDisplayed()){
             logToFile("ANR detected! Clicking 'Wait'...")
