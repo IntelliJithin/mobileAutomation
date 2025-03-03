@@ -123,13 +123,7 @@ jobs:
             adb install downloaded_apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server"
             echo "Installing UiAutomator2 server test APK"
             adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
-            
-            echo "Granting necessary permissions"
-            adb shell pm grant io.appium.setting android.permission.SETTINGS
-            adb shell pm grant io.appium.setting android.permission.WRITE_SECURE_SETTINGS
-            adb shell pm grant io.appium.setting android.permission.CHANGE_CONFIGURATION
-            adb shell pm grant io.appium.setting android.permission.READ_PHONE_STATE
-            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
+          
             
             echo "Starting logcat to capture logs"
             adb logcat -s UiAutomator2 &
