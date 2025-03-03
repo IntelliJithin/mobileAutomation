@@ -141,7 +141,11 @@ jobs:
             adb shell settings put global adb_enabled 1
             adb shell settings put global debug_view_attributes 0
             adb shell settings put global verifier_verify_adb_installs 0
+            adb shell settings put system power_profile low_power
+            adb shell settings put system screen_off_timeout 1800000
             adb shell setprop debug.hwui.renderer opengl
+            adb shell setprop debug.hwui.overdraw false
+            adb shell setprop debug.hwui.profile false
             adb shell am kill-all
             
             echo "Starting logcat to capture logs"

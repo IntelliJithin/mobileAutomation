@@ -64,7 +64,10 @@ export const config = {
         'appium:automationName': 'UIAutomator2',
         'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk'),
         'appium:newCommandTimeout': 240,
-        'appium:adbExecTimeout': 200000
+        'appium:adbExecTimeout': 200000,
+        'appium:newCommandTimeout': 120,
+        'appium:uiautomator2ServerLaunchTimeout': 60000,
+        'appium:uiautomator2ServerInstallTimeout': 60000
     }],
 
     //
