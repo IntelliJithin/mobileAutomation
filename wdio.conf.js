@@ -60,7 +60,7 @@ export const config = {
         // capabilities for local Appium web tests on an Android Emulator
         'appium:platformName': 'Android',
         'appium:platformVersion': '11.0',
-        'appium:deviceName': 'Nexus 5',
+        'appium:deviceName': 'Nexus 4',
         'appium:automationName': 'UIAutomator2',
         'appium:app': path.join(process.cwd(),'app/android/ApiDemos-debug.apk'),
         'appium:newCommandTimeout': 240,

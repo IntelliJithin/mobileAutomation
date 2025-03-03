@@ -99,10 +99,11 @@ jobs:
         with: 
           api-level: 30
           arch: x86_64
-          profile: Nexus 5
+          profile: Nexus 4
           ram-size: 2048M
           heap-size: 512M
           disk-size: 10G
+          emulator-options: "-no-window -skin 480x800 -dpi-device 120"
           script: |
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
