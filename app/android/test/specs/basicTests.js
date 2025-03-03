@@ -9,30 +9,6 @@ function logToFile(message) {
 
 logToFile("Test suite started");
 
-async function handleANRDialogs() {
-    try {
-        let anrDetected = true;
-
-        while (anrDetected) {
-            logToFile("Checking for ANR dialog...")
-            const waitButton = $('android=new UiSelector().resourceId("android:id/aerr_wait")');
-
-            if (await waitButton.isDisplayed()){
-              logToFile("ANR detected! Clicking 'Wait'...")
-              await waitButton.waitForClickable();
-              await waitButton.click();
-              await browser.pause(1000);
-            }  else {
-                anrDetected = false;
-                logToFile("No ANR dialog detected");
-            }
-        }
-        
-    } catch (error){
-        logToFile("Error handling ANR dialogs:", error.message);
-    }
-}
-
 async function scrollUntilVisible(element) {
     let maxScrolls = 10;
     let scrolls = 0;
@@ -62,9 +38,7 @@ describe('Input text', () => {
 
     it('Click Views', async() => {
         logToFile("Starting 'Click Views' test");
-        
-        await handleANRDialogs();
-        
+                
         try {
         logToFile("Looking for Views element");
         const viewsElement = $('~Views');
@@ -85,8 +59,6 @@ describe('Input text', () => {
 
     it('Click Auto Complete', async() => {
         logToFile("Starting Auto Complete test");
-
-        await handleANRDialogs();
 
         try{
         logToFile("Looking for auto complete element");
