@@ -103,9 +103,6 @@ jobs:
           ram-size: 2048M
           heap-size: 512M
           disk-size: 10G
-          disable-animation: true
-          enable-h2-keyboard: true
-          headless: true
           script: |
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
@@ -133,6 +130,16 @@ jobs:
             adb shell pm grant io.appium.android.setting android.permission.CHANGE_CONFIGURATION
             adb shell pm grant io.appium.android.setting android.permission.READ_PHONE_STATE
             adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
+
+            echo "Set Developer options to prevent"
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
+            adb shell settings put global background_process_limit 2
+            adb shell settings put global always_finish_activities 1
+            adb shell setprop persist.sys.strictmode.disable true
+            adb shell setprop debug.hwui.renderer opengl
+            adb shell am kill-all
             
             echo "Starting logcat to capture logs"
             adb logcat -s UiAutomator2 &
