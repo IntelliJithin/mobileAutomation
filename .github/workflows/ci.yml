@@ -137,7 +137,10 @@ jobs:
             adb shell settings put global animator_duration_scale 0
             adb shell settings put global background_process_limit 2
             adb shell settings put global always_finish_activities 1
-            adb shell setprop persist.sys.strictmode.disable true
+            adb shell settings put global development_settings_enabled 1
+            adb shell settings put global adb_enabled 1
+            adb shell settings put global debug_view_attributes 0
+            adb shell settings put global verifier_verify_adb_installs 0
             adb shell setprop debug.hwui.renderer opengl
             adb shell am kill-all
             
