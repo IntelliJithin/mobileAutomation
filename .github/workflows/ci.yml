@@ -103,7 +103,6 @@ jobs:
           ram-size: 2048M
           heap-size: 512M
           disk-size: 10G
-          emulator-options: "-no-window -skin 480x800 -dpi-device 120"
           script: |
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
@@ -114,6 +113,12 @@ jobs:
             echo "Waiting for emulator to fully boot"
             adb wait-for-device
             adb shell getprop sys.boot_completed | grep -m 1 "1"
+
+            adb shell am force-stop com.android.systemui
+            adb shell am force-stop com.android.settings
+            adb shell am kill-all
+            adb shell pm disable-user com.android.vending 
+            adb shell pm disable-user com.google.android.gms
 
             echo "Emulator boot completed. Checking devices..."
             adb devices
@@ -131,6 +136,8 @@ jobs:
             adb shell pm grant io.appium.android.setting android.permission.CHANGE_CONFIGURATION
             adb shell pm grant io.appium.android.setting android.permission.READ_PHONE_STATE
             adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
+
+            adb shell dumpsys meminfo && adb shell top -n 1 -b
 
             echo "Set Developer options to prevent"
             adb shell settings put global window_animation_scale 0
@@ -161,6 +168,8 @@ jobs:
             echo "Manually starting UiAutomator2..."
             adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
 
+            adb logcat -d > logcat_before_tests.txt
+            
             echo "Running tests now..."
             npx wdio wdio.conf.js
            
