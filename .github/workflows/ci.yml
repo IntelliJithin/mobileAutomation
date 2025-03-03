@@ -99,6 +99,13 @@ jobs:
         with: 
           api-level: 30
           arch: x86_64
+          profile: Nexus 5
+          ram-size: 2048M
+          heap-size: 512M
+          disk-size: 10G
+          disable-animation: true
+          enable-h2-keyboard: true
+          headless: true
           script: |
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
