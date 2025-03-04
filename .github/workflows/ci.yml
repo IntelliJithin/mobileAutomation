@@ -117,8 +117,8 @@ jobs:
             adb shell am force-stop com.android.systemui
             adb shell am force-stop com.android.settings
             adb shell am kill-all
-            adb shell pm disable-user com.android.vending 
-            adb shell pm disable-user com.google.android.gms
+            adb shell pm hide com.android.vending 
+            adb shell pm hide com.google.android.gms
 
             echo "Emulator boot completed. Checking devices..."
             adb devices
