@@ -1,6 +1,9 @@
 import {$, browser} from "@wdio/globals";
 import fs from "fs";
 
+let anrCount = 0;
+
+
 
 function logToFile(message) {
     fs.appendFileSync("./test-log.txt", message + "\n");
@@ -11,23 +14,30 @@ logToFile("Test suite started");
 
 async function handleANRDialogs() {
     try {
-        let anrDetected = true;
-        while (anrDetected) {
+        logToFile("Checking for ANR dialogs");
+
+        let retries = 5;
+        while (retries > 0) {
             const waitButton = $('android=new UiSelector().resourceId("android:id/aerr_wait")');
 
-        if (await waitButton.isDisplayed()) {
-            logToFile("ANR dialog detected with 'Wait' button. Dismissin it...");
-            await waitButton.waitForClickable();
-            await waitButton.click();
-            await browser.pause(100000);
-        } else {
-            anrDetected=false;
-            logToFile("No ANR dialog detected");
+            if (await waitButton.isDisplayed()) {
+                anrCount++;
+                logToFile("ANR detected! Clicking 'Wait' (ANR #${anrCount})...");
+
+                await waitButton.waitForClickable();
+                await waitButton.click();
+                await browser.pause(5000);
+            } else {
+                logToFile("No more ANR dialogs detected");
+                return;
+            }
+
+            retries--;
         }
+        logToFile("Finished checking for ANRs after retries");
+    }    catch (error) {
+        logToFile("Error handling ANR dialogs...")
     }
-    } catch (error) {
-        logToFile("Error handling ANR dialog");
-    }      
 }
 
 async function scrollUntilVisible(element) {
