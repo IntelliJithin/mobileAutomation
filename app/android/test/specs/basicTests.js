@@ -19,14 +19,14 @@ async function handleANRDialogs() {
             logToFile("ANR dialog detected with 'Wait' button. Dismissin it...");
             await waitButton.waitForClickable();
             await waitButton.click();
-            await browser.pause(50000);
+            await browser.pause(100000);
         } else {
             anrDetected=false;
             logToFile("No ANR dialog detected");
         }
     }
     } catch (error) {
-        logToFile("Error handling ANR dialog: " + error.message);
+        logToFile("Error handling ANR dialog");
     }      
 }
 
