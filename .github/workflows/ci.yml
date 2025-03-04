@@ -115,10 +115,10 @@ jobs:
             adb shell getprop sys.boot_completed | grep -m 1 "1"
 
             adb shell am force-stop com.android.systemui
-            adb shell am force-stop com.android.settings
+            adb shell am force-stop com.android.vending 
+            adb shell am force-stop com.google.android.gms
             adb shell am kill-all
-            adb shell pm hide com.android.vending 
-            adb shell pm hide com.google.android.gms
+
 
             echo "Emulator boot completed. Checking devices..."
             adb devices
