@@ -33,7 +33,7 @@ async function handleANRDialogs() {
 
                 await waitButton.waitForClickable();
                 await waitButton.click();
-                await browser.pause(5000);
+                await browser.pause(10000);
 
                 logToFile("Rechecking for ANR dialogs...")
             } else {
@@ -49,21 +49,27 @@ async function handleANRDialogs() {
     }
 }
 
-async function scrollUntilVisible(element) {
-    const maxScrolls = 5;
+async function scrollToElement(element, elementId) {
+    let maxScrolls = 10;
     let scrolls = 0;
 
     while (!(await element.isDisplayed()) && scrolls < maxScrolls) {
         logToFile(`Scrolling to find element.....Attempt ${scrolls + 1}`);
 
-        await browser.execute("mobile: scroll", {direction: "down"});
+        await browser.execute("mobile: scroll", {
+            strategy: "accessibility id",
+            selector: elementId,
+            maxSwipes: 3,
+        });
 
-        await browser.pause(1000);
+        await browser.pause(2000);
         scrolls++;
     }
 
     if (!(await element.isDisplayed())) {
-        throw new Error("Element not found after scrolling");
+        logToFile("Element found");
+    } else {
+        throw new Error ("Element not found after maximum scroll attempts");
     }
     
 }
@@ -79,7 +85,7 @@ describe('Input text', () => {
         logToFile("Looking for Views element");
         const viewsElement = $('~Views');
 
-        await scrollUntilVisible(viewsElement);    
+        await scrollToElement(viewsElement, "Views");    
 
         logToFile("Clicking views");    
         await viewsElement.click();
