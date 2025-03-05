@@ -3,8 +3,6 @@ import fs from "fs";
 
 let anrCount = 0;
 
-
-
 function logToFile(message) {
     fs.appendFileSync("./test-log.txt", message + "\n");
     console.log(message);
@@ -22,11 +20,17 @@ async function handleANRDialogs() {
 
             if (await waitButton.isDisplayed()) {
                 anrCount++;
-                logToFile("ANR detected! Clicking 'Wait' (ANR #${anrCount})...");
+                logToFile(`ANR detected! Clicking 'Wait' (ANR #${anrCount})...`);
+
+                const screenshotPath = `./screenshots/ANR_screenshot_${anrCount}.png`;
+                await browser.saveScreenshot(screenshotPath);
+                logToFile(`Screenshot saved: ${screenshotPath}`);
 
                 await waitButton.waitForClickable();
                 await waitButton.click();
                 await browser.pause(5000);
+
+                logToFile("Rechecking for ANR dialogs...")
             } else {
                 logToFile("No more ANR dialogs detected");
                 return;
@@ -36,16 +40,16 @@ async function handleANRDialogs() {
         }
         logToFile("Finished checking for ANRs after retries");
     }    catch (error) {
-        logToFile("Error handling ANR dialogs...")
+        logToFile(`Error handling ANR dialogs: ${error.message}`);
     }
 }
 
 async function scrollUntilVisible(element) {
-    let maxScrolls = 10;
+    const maxScrolls = 5;
     let scrolls = 0;
 
     while (!(await element.isDisplayed()) && scrolls < maxScrolls) {
-        logToFile('Scrolling to find element.....Attempt ${scrolls + 1}');
+        logToFile(`Scrolling to find element.....Attempt ${scrolls + 1}`);
 
         await driver.touchPerform ([
             { action: "press", options: {x:500, y: 1500} },
@@ -61,6 +65,7 @@ async function scrollUntilVisible(element) {
         logToFile("Element is now visible");
     } else {
         logToFile("Element not found after max scroll attempts");
+        throw new Error("Element not found after max scroll attempts...")
     }
     
 }
@@ -78,13 +83,11 @@ describe('Input text', () => {
 
         await scrollUntilVisible(viewsElement);    
 
-        await viewsElement.waitForExist({timeout:50000});
-        await viewsElement.waitForDisplayed({timeout:50000});
         logToFile("Clicking views");    
         await viewsElement.click();
         } catch (error) {
             logToFile("Error clicking views: " + error);
-            await browser.saveScreenshot('./error_screenshot_views.png');
+            await browser.saveScreenshot('./screenshots/error_screenshot_views.png');
             throw error;
         }
         await browser.pause(5000);
@@ -104,7 +107,7 @@ describe('Input text', () => {
         await autoCompleteElement.click();
         } catch (error) {
             logToFile("Error clicking auto complete: " + error.message);
-            await browser.saveScreenshot('./error_Screenshot_auto_complete.png');
+            await browser.saveScreenshot('./screenshots/error_Screenshot_auto_complete.png');
             throw error;
         }
         await browser.pause(5000);
