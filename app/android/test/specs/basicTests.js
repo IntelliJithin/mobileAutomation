@@ -1,8 +1,6 @@
 import {$, browser} from "@wdio/globals";
 import fs from "fs";
 
-let anrCount = 0;
-
 function logToFile(message) {
     fs.appendFileSync("./test-log.txt", message + "\n");
     console.log(message);
@@ -10,43 +8,34 @@ function logToFile(message) {
 
 logToFile("Test suite started");
 
-async function handleANRDialogs() {
-    try {
-        logToFile("Checking for ANR dialogs");
+let anrMonitorActive = false;
 
-        let retries = 5;
-        while (retries > 0) {
+async function startANRMonitor() {
+    if (anrMonitorActive) return;
+    anrMonitorActive = true;
+
+    logToFile("ANR Monitor started");
+
+    while (anrMonitorActive) {
+        try{
             const waitButton = $('android=new UiSelector().resourceId("android:id/aerr_wait")');
 
             if (await waitButton.isDisplayed()) {
-                anrCount++;
-                logToFile(`ANR detected! Clicking 'Wait' (ANR #${anrCount})...`);
-
-                const screenshotDir = "./screenshots";
-                if (!fs.existsSync(screenshotDir)) {
-                    fs.mkdirSync(screenshotDir, { recursive: true});
-                }
-
-                const screenshotPath = `${screenshotDir}/ANR_screenshot_${anrCount}.png`;
-                await browser.saveScreenshot(screenshotPath);
-                logToFile(`Screenshot saved: ${screenshotPath}`);
+                logToFile ("ANR Detected, clicking Wait");
+                const timestamp = new Date().toISOString().replace(/:/g, "-");
+                await browser.saveScreenshot(`./screenshots/ANR_${timestamp}.png`);
 
                 await waitButton.waitForClickable();
                 await waitButton.click();
-                await browser.pause(10000);
+                await browser.pause(2000);
 
-                logToFile("Rechecking for ANR dialogs...")
-            } else {
-                logToFile("No more ANR dialogs detected");
-                return;
-            }
-
-            retries--;
+                logToFile("ANR cleared");
         }
-        logToFile("Finished checking for ANRs after retries");
-    }    catch (error) {
-        logToFile(`Error handling ANR dialogs: ${error.message}`);
+    } catch (error) {
+        logToFile("ANR monitor error")
     }
+    await browser.pause(3000);
+}
 }
 
 async function scrollToElement(element, elementId) {
@@ -76,11 +65,18 @@ async function scrollToElement(element, elementId) {
 
 describe('Input text', () => {
 
+    beforeEach(async () => {
+        await startANRMonitor();
+    });
+
+    afterEach(async () => {
+        anrMonitorActive=false;
+        logToFile("ANR monitor stopped");
+    })
+
     it('Click Views', async() => {
         logToFile("Starting 'Click Views' test");
-        
-        await handleANRDialogs();
-        
+                
         try {
         logToFile("Looking for Views element");
         const viewsElement = $('~Views');
@@ -103,8 +99,6 @@ describe('Input text', () => {
 
     it('Click Auto Complete', async() => {
         logToFile("Starting Auto Complete test");
-
-        await handleANRDialogs();
 
         try{
         logToFile("Looking for auto complete element");
