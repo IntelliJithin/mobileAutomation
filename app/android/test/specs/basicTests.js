@@ -56,21 +56,14 @@ async function scrollUntilVisible(element) {
     while (!(await element.isDisplayed()) && scrolls < maxScrolls) {
         logToFile(`Scrolling to find element.....Attempt ${scrolls + 1}`);
 
-        await driver.touchPerform ([
-            { action: "press", options: {x:500, y: 1500} },
-            { action: "moveTo", options: {x:500, y: 500} },
-            { action: "release" },
-        ]);
+        await browser.execute("mobile: scroll", {direction: "down"});
 
         await browser.pause(1000);
         scrolls++;
     }
 
-    if (await element.isDisplayed()) {
-        logToFile("Element is now visible");
-    } else {
-        logToFile("Element not found after max scroll attempts");
-        throw new Error("Element not found after max scroll attempts...")
+    if (!(await element.isDisplayed())) {
+        throw new Error("Element not found after scrolling");
     }
     
 }
@@ -120,7 +113,7 @@ describe('Input text', () => {
             const screenshotPath = "./screenshots/error_screenshot_auto_complete.png"; 
             await browser.saveScreenshot(screenshotPath);
             logToFile(`Screenshot saved: ${screenshotPath}`);
-            
+
             throw error;
         }
         await browser.pause(5000);
