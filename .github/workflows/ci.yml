@@ -170,6 +170,9 @@ jobs:
 
             adb logcat -d > logcat_before_tests.txt
             
+            echo "Creating screenshots directory"
+            mkdir -p ./screenshots
+            
             echo "Running tests now..."
             npx wdio wdio.conf.js
            

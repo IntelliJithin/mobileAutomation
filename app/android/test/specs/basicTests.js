@@ -22,7 +22,12 @@ async function handleANRDialogs() {
                 anrCount++;
                 logToFile(`ANR detected! Clicking 'Wait' (ANR #${anrCount})...`);
 
-                const screenshotPath = `./screenshots/ANR_screenshot_${anrCount}.png`;
+                const screenshotDir = "./screenshots";
+                if (!fs.existsSync(screenshotDir)) {
+                    fs.mkdirSync(screenshotDir, { recursive: true});
+                }
+
+                const screenshotPath = `${screenshotDir}/ANR_screenshot_${anrCount}.png`;
                 await browser.saveScreenshot(screenshotPath);
                 logToFile(`Screenshot saved: ${screenshotPath}`);
 
@@ -87,7 +92,11 @@ describe('Input text', () => {
         await viewsElement.click();
         } catch (error) {
             logToFile("Error clicking views: " + error);
-            await browser.saveScreenshot('./screenshots/error_screenshot_views.png');
+
+            const screenshotPath = "./screenshots/error_screenshot_views.png";
+            await browser.saveScreenshot(screenshotPath);
+            logToFile(`Screenshot saved: ${screenshotPath}`);
+
             throw error;
         }
         await browser.pause(5000);
@@ -107,7 +116,11 @@ describe('Input text', () => {
         await autoCompleteElement.click();
         } catch (error) {
             logToFile("Error clicking auto complete: " + error.message);
-            await browser.saveScreenshot('./screenshots/error_Screenshot_auto_complete.png');
+
+            const screenshotPath = "./screenshots/error_screenshot_auto_complete.png"; 
+            await browser.saveScreenshot(screenshotPath);
+            logToFile(`Screenshot saved: ${screenshotPath}`);
+            
             throw error;
         }
         await browser.pause(5000);
