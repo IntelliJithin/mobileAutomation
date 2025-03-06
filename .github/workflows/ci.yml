@@ -100,9 +100,9 @@ jobs:
           api-level: 30
           arch: x86_64
           profile: Nexus 4
-          ram-size: 2048M
-          heap-size: 512M
-          disk-size: 10G
+          ram-size: 4096M
+          heap-size: 1024M
+          disk-size: 20G
           script: |
             echo "Setting APK permissions"
             chmod 644 downloaded_apks/*.apk
@@ -112,23 +112,28 @@ jobs:
             
             echo "Waiting for emulator to fully boot"
             adb wait-for-device
-            adb shell getprop sys.boot_completed | grep -m 1 "1"
+            adb shell getprop sys.boot_completed | grep -m 1 "1" || sleep 30
 
             echo "Checking for ANR before running tests"
-            adb shell dumpsys activity | grep "Application Not Responding" || echo "No ANR detected"
+            adb shell dumpsys activity | grep "mFocusedWindow"
 
             echo "Dismissing any ANR popups..."
             adb shell input keyevent KEYCODE_DPAD_DOWN
             adb shell input keyevent KEYCODE_ENTER
             
+            echo "Restarting System UI to prevent ANRs..."
             adb shell am force-stop com.android.systemui
-            adb shell am force-stop com.android.vending 
-            adb shell am force-stop com.google.android.gms
-            adb shell am kill-all
-
-
+            adb shell am startservice -a android.intent.action.REBOOT
+                        
             echo "Emulator boot completed. Checking devices..."
             adb devices
+
+            echo "Monitoring system performance"
+            adb shell dumpsys cpuinfo > cpu_info_before_tests.txt
+            adb shell dumpsys meminfo > mem_info_before_tests.txt
+            adb shell top -n 1 -b > top_output_before_tests.txt
+
+            echo "Captured CPU, Memory, and Process info before tests"
 
             echo "Installing Appium settings APK"
             adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
