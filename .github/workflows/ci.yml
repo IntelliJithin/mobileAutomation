@@ -119,7 +119,7 @@ jobs:
 
             echo "Dismissing any ANR popups..."
             adb shell input keyevent KEYCODE_DPAD_DOWN
-            adb shell unput keyevent KEYCODE_ENTER
+            adb shell input keyevent KEYCODE_ENTER
             
             adb shell am force-stop com.android.systemui
             adb shell am force-stop com.android.vending 
