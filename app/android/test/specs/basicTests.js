@@ -9,29 +9,22 @@ function logToFile(message) {
 logToFile("Test suite started");
 
 
-async function scrollUntilVisible(element) {
-    const maxScrolls = 5;
+async function scrollUntilElementFound(locator, maxScrolls = 5) {
     let scrolls = 0;
 
-    while (!(await element.isDisplayed()) && scrolls < maxScrolls) {
+    while (scrolls < maxScrolls) {
         logToFile(`Scrolling to find element.....Attempt ${scrolls + 1}`);
+        const element = await $(locator);
+        if (await element.isDisplayed()){
+            logToFile("ELement found")
+            return element;
+        }
 
-        await driver.touchPerform ([
-            { action: "press", options: {x:500, y: 1500} },
-            { action: "moveTo", options: {x:500, y: 500} },
-            { action: "release" },
-        ]);
-
+        await browser.execute("mobile: scroll", {direction: "down"});
         await browser.pause(1000);
-        scrolls++;
+        scrolls+=1;
     }
-
-    if (await element.isDisplayed()) {
-        logToFile("Element is now visible");
-    } else {
-        logToFile("Element not found after max scroll attempts");
-        throw new Error("Element not found after max scroll attempts...")
-    }
+    throw new Error(`Element not found after ${maxScrolls} scroll attempts`);
     
 }
 
@@ -42,9 +35,7 @@ describe('Input text', () => {
                 
         try {
         logToFile("Looking for Views element");
-        const viewsElement = $('~Views');
-
-        await scrollUntilVisible(viewsElement);    
+        const viewsElement = await scrollUntilElementFound('~Views');
 
         logToFile("Clicking views");    
         await viewsElement.click();
@@ -57,7 +48,7 @@ describe('Input text', () => {
     });
 
     it('Click Auto Complete', async() => {
-        
+
         logToFile("Starting Auto Complete test");
 
         try{
