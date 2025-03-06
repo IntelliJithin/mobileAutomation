@@ -183,11 +183,22 @@ jobs:
             echo "Running tests now..."
             npx wdio wdio.conf.js
            
+            echo "Capturing ANR logs for debugging"
+            adb shell ls /data/anr/
+            adb shell cat /data/anr/anr_*.txt > anr_logs.txt || echo "No ANR logs found"
+            
             echo "Stopping logcat"
             pkill -f "adb logcat"
            
             echo "Checking uiautomator2 logs"
             adb logcat -d | grep -i "uiautomator"
+      
+      - name: Upload ANR logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anr-logs
+          path: anr_logs.txt
       
       - name: Upload Screenshots
         uses: actions/upload-artifact@v4
