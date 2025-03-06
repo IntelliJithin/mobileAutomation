@@ -114,6 +114,13 @@ jobs:
             adb wait-for-device
             adb shell getprop sys.boot_completed | grep -m 1 "1"
 
+            echo "Checking for ANR before running tests"
+            adb shell dumpsys activity | grep "Application Not Responding" || echo "No ANR detected"
+
+            echo "Dismissing any ANR popups..."
+            adb shell input keyevent KEYCODE_DPAD_DOWN
+            adb shell unput keyevent KEYCODE_ENTER
+            
             adb shell am force-stop com.android.systemui
             adb shell am force-stop com.android.vending 
             adb shell am force-stop com.google.android.gms
