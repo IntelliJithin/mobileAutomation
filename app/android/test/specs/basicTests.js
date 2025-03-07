@@ -14,13 +14,22 @@ async function scrollUntilElementFound(locator, maxScrolls = 5) {
 
     while (scrolls < maxScrolls) {
         logToFile(`Scrolling to find element.....Attempt ${scrolls + 1}`);
+
+        try {
+            await browser.execute('mobile: scroll', {
+                strategy: 'accessibility id',
+                selector: locator
+            });
+        } catch (error) {
+            logToFile(`Error while scrolling: ${error}`);
+        }
+
         const element = await $(locator);
         if (await element.isDisplayed()){
             logToFile("ELement found")
             return element;
         }
 
-        await browser.execute("mobile: scroll", {direction: "down"});
         await browser.pause(1000);
         scrolls+=1;
     }
