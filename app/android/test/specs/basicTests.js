@@ -28,9 +28,18 @@ import {$, browser} from "@wdio/globals";
 describe('Basic test', () => {
 
     it('Click Content', async() => {
-        const contentElemet = $('~Content');
-        await browser.pause(2500);
-        contentElemet.click();
+
+        try {
+            const contentElemet = $('~Content');
+            await browser.pause(2500);
+            contentElemet.click();
+            await browser.pause(2500);
+        } catch (error) {
+
+            await browser.saveScreenshot('./screenshots/error.png');
+            throw error;
+        }
+
         await browser.pause(2500);
     });
 
