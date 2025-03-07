@@ -16,18 +16,15 @@ async function scrollUntilElementFound(locator, maxScrolls = 5) {
         logToFile(`Scrolling to find element.....Attempt ${scrolls + 1}`);
 
         try {
-            await browser.execute('mobile: scroll', {
-                strategy: 'accessibility id',
-                selector: locator
-            });
-        } catch (error) {
-            logToFile(`Error while scrolling: ${error}`);
-        }
+            const element = $(`android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().description("${locator}"))`);
+            
+            if (await element.isDisplayed()){
+                logToFile("ELement found")
+                return element;
+            }
 
-        const element = await $(locator);
-        if (await element.isDisplayed()){
-            logToFile("ELement found")
-            return element;
+        } catch (error) {
+            logToFile(`Error during scrolling attemp ${scrolls + 1}: ${error}`);
         }
 
         await browser.pause(1000);
