@@ -93,7 +93,7 @@ jobs:
           
       - name: Start android emulator and run test
         uses: reactivecircus/android-emulator-runner@v2
-        timeout-minutes: 15
+        timeout-minutes: 20
         env:
           ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
         with: 
