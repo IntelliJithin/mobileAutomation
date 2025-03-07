@@ -1,8 +1,5 @@
 import {$, browser} from "@wdio/globals";
 
-logToFile("Test suite started");
-
-
 /*async function scrollUntilElementFound(locator, maxScrolls = 5) {
     let scrolls = 0;
 
@@ -32,7 +29,9 @@ describe('Basic test', () => {
 
     it('Click Content', async() => {
         const contentElemet = $('~Content');
+        await browser.pause(2500);
         contentElemet.click();
+        await browser.pause(2500);
     });
 
    /* it('Click Auto Complete', async() => {
