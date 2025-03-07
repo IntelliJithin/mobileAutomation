@@ -167,9 +167,6 @@ jobs:
             adb shell setprop debug.hwui.profile false
             adb shell am kill-all
             
-            echo "Starting logcat to capture logs"
-            adb logcat -s UiAutomator2 &
-            
             echo "Starting Appium server"
             appium --base-path /wd/hub --log appium.log &
             
@@ -178,8 +175,6 @@ jobs:
             
             echo "Manually starting UiAutomator2..."
             adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
-
-            adb logcat -d > logcat_before_tests.txt
             
             echo "Creating screenshots directory"
             mkdir -p ./screenshots
@@ -190,12 +185,7 @@ jobs:
             echo "Capturing ANR logs for debugging"
             adb shell ls /data/anr/
             adb shell cat /data/anr/anr_*.txt > anr_logs.txt || echo "No ANR logs found"
-            
-            echo "Stopping logcat"
-            pkill -f "adb logcat"
-           
-            echo "Checking uiautomator2 logs"
-            adb logcat -d | grep -i "uiautomator"
+
       
       - name: Upload ANR logs
         uses: actions/upload-artifact@v4
