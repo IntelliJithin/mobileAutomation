@@ -1,10 +1,4 @@
 import {$, browser} from "@wdio/globals";
-import fs from "fs";
-
-function logToFile(message) {
-    fs.appendFileSync("./test-log.txt", message + "\n");
-    console.log(message);
-}
 
 logToFile("Test suite started");
 
@@ -37,20 +31,8 @@ logToFile("Test suite started");
 describe('Basic test', () => {
 
     it('Click Content', async() => {
-        logToFile("Starting 'Click Content' test");
-                
-        try {
-        logToFile("Looking for Content element");
-        const viewsElement = await scrollUntilElementFound('~Content');
-
-        logToFile("Clicking Content");    
-        await viewsElement.click();
-        } catch (error) {
-            logToFile("Error clicking views: " + error);
-            await browser.saveScreenshot('./screenshots/error_screenshot_content.png');
-            throw error;
-        }
-        await browser.pause(5000);
+        const contentElemet = $('~Content');
+        contentElemet.click();
     });
 
    /* it('Click Auto Complete', async() => {
@@ -79,8 +61,5 @@ describe('Basic test', () => {
         await browser.pause(5000);
     }); */
 
-    after(() => {
-        logToFile("Test suite finished");
-    });
 
 });
