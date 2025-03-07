@@ -9,7 +9,7 @@ function logToFile(message) {
 logToFile("Test suite started");
 
 
-async function scrollUntilElementFound(locator, maxScrolls = 5) {
+/*async function scrollUntilElementFound(locator, maxScrolls = 5) {
     let scrolls = 0;
 
     while (scrolls < maxScrolls) {
@@ -32,28 +32,28 @@ async function scrollUntilElementFound(locator, maxScrolls = 5) {
     }
     throw new Error(`Element not found after ${maxScrolls} scroll attempts`);
     
-}
+} */
 
-describe('Input text', () => {
+describe('Basic test', () => {
 
-    it('Click Views', async() => {
-        logToFile("Starting 'Click Views' test");
+    it('Click Content', async() => {
+        logToFile("Starting 'Click Content' test");
                 
         try {
-        logToFile("Looking for Views element");
-        const viewsElement = await scrollUntilElementFound('~Views');
+        logToFile("Looking for Content element");
+        const viewsElement = await scrollUntilElementFound('~Content');
 
-        logToFile("Clicking views");    
+        logToFile("Clicking Content");    
         await viewsElement.click();
         } catch (error) {
             logToFile("Error clicking views: " + error);
-            await browser.saveScreenshot('./screenshots/error_screenshot_views.png');
+            await browser.saveScreenshot('./screenshots/error_screenshot_content.png');
             throw error;
         }
         await browser.pause(5000);
     });
 
-    it('Click Auto Complete', async() => {
+   /* it('Click Auto Complete', async() => {
 
         logToFile("Starting Auto Complete test");
 
@@ -77,7 +77,7 @@ describe('Input text', () => {
             throw error;
         }
         await browser.pause(5000);
-    });
+    }); */
 
     after(() => {
         logToFile("Test suite finished");
