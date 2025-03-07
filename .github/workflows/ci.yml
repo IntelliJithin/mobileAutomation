@@ -123,7 +123,7 @@ jobs:
             
             echo "Restarting System UI to prevent ANRs..."
             adb shell am force-stop com.android.systemui
-            adb shell am startservice -a android.intent.action.REBOOT
+            adb shell am start com.android.systemui/.SystemUIService
                         
             echo "Emulator boot completed. Checking devices..."
             adb devices
