@@ -27,6 +27,9 @@ jobs:
       - name: 🏗️ Install Dependencies
         run: npm install
  
+      - name: Install WeDriverIO BrowserStack Services
+        run: npm install --save-dev wdio-browserstack-service
+
       - name: 🔧 Install Appium & WebDriverIO Dependencies
         run: |
           npm install -g appium
