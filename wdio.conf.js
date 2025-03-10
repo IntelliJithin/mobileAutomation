@@ -53,4 +53,12 @@ export const config = {
         timeout: 60000
     },
 
+    afterTest: async function (test) {
+        if (test.passed) {
+            await browser.execute('browserstack_executor: {"action": "setTestStatus", "arguments": { "status": "passed", "reason": "Test passed successfully" }}');
+        } else {
+            await browser.execute('browserstack_executor: {"action": "setTestStatus", "arguments": { "status": "failed", "reason": "Test failed" }}');
+        }
+    }
+
 }
