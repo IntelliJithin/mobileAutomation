@@ -2,12 +2,8 @@ import 'dotenv/config';
 export const config = {
   
     
-    user : process.env.BROWSERSTACK_USER,
-    key : process.env.BROWSERSTACK_KEY,
-
-    hostname : 'hub.browserstack.com',
-    protocol : 'https',
-    port : 443,
+    user : process.env.BROWSERSTACK_USERNAME,
+    key : process.env.BROWSERSTACK_ACCESS_KEY,
 
     specs: [
         // ToDo: define location for spec files here
