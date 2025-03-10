@@ -181,6 +181,9 @@ jobs:
             echo "Creating ANR directory"
             mkdir -p ./anr-logs
             
+            echo "Creating bugreport"
+            mkdir -p ./bugreport
+            
             echo "Creating screenshots directory"
             mkdir -p ./screenshots
 
@@ -194,11 +197,20 @@ jobs:
             adb shell ls /anr-logs/
             adb shell cat /anr-logs/anr_*.txt > anr_logs.txt || echo "No ANR logs found"
 
-      
-      - name: Upload performance logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
+            echo "Capturing bugreport for debuggin..."
+            adb bugreport > bugreport.zip
+
+      -  name: Upload bugreport
+         uses: actions/upload-artifact@v4
+         if: always()
+         with:
+          name: bugreport
+          path: bugreport.zip
+     
+      -  name: Upload performance logs
+         uses: actions/upload-artifact@v4
+         if: always()
+         with:
           name: performance-logs
           path: |
             ./cpu_info_during_tests.txt
