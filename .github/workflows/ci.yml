@@ -1,4 +1,4 @@
-name: Mobile automation test
+name: Mobile Automation Test on BrowserStack
  
 on:
   workflow_dispatch:
@@ -6,234 +6,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
- 
     steps:
       - name: ⬇️ Checkout Code
         uses: actions/checkout@v4
  
-      - name: 🐢 Setup Node
+      - name: 🐢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: npm
  
-      - name: Clean node_modules and package-lock.json
-        run: |
-          rm -rf node_modules
-          rm package-lock.json
-          npm install # Reinstall dependencies cleanly
+      - name: 📦 Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
  
       - name: 🏗️ Install Dependencies
         run: npm install
  
-      - name: Install Appium and drivers
+      - name: 🔧 Install Appium & WebDriverIO Dependencies
         run: |
-          echo "Checking currently installed Appium driver..."
-          if ! command -v appium &> /dev/null; then
-           echo "Appium not found. Installing..."
-           npm install -g appium
-          fi
-          
-          INSTALLED_DRIVERS=$(appium driver list --installed 2>&1 || echo "Error: Appium command failed")
-          if echo "$INSTALLED_DRIVERS" | grep -q "uiautomator2"; then
-           echo "uiautomator2 is already installed. Skipping reinstallation."
-          else
-           echo "uiautomator2 not found. Reinstalling Appium and drivers..."
-           appium driver install uiautomator2
-          fi
-                    
-      - name: Install Java
-        run: sudo apt-get install -y openjdk-11-jdk
+          npm install -g appium
+          appium driver install uiautomator2
  
-      - name: Install Android SDK and Setup Path
+      - name: 🔑 Set Up BrowserStack Environment Variables
         run: |
-         echo "📥 Installing Android SDK & dependencies..."
-         sudo apt-get update
-         sudo apt-get install -y wget unzip
+          echo "BROWSERSTACK_USERNAME=${{ secrets.BROWSERSTACK_USERNAME }}" >> $GITHUB_ENV
+          echo "BROWSERSTACK_ACCESS_KEY=${{ secrets.BROWSERSTACK_ACCESS_KEY }}" >> $GITHUB_ENV
  
-         echo "📥 Downloading Android command-line tools..."
-         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
- 
-         echo "📂 Extracting Android command-line tools..."
-         mkdir -p $HOME/android-sdk/cmdline-tools
-         unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
-         mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
- 
-         echo "🔧 Setting environment variables..."
-         echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-         echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH" >> $GITHUB_ENV
- 
-         # Reload the environment variables
-         source $GITHUB_ENV
- 
-         echo "📌 Verifying sdkmanager existence..."
-         if [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-            echo "✅ sdkmanager found!"
-         else
-            echo "❌ ERROR: sdkmanager not found!"
-            exit 1
-         fi
- 
-         echo "✅ Accepting licenses..."
-         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || echo "⚠️ License acceptance failed"
- 
-         echo "📥 Installing required SDK packages..."
-         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "build-tools;30.0.3" "platforms;android-30" "system-images;android-30;google_apis;x86_64"
- 
-         echo "📌 Listing installed SDK components..."
-         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list 
-
-      - name: Verify SDK Installation
-        run: |
-          echo "Checking Android SDK paths..."
-          ls -la $ANDROID_HOME
-          ls -la $ANDROID_HOME/platforms
-          ls -la $ANDROID_HOME/system-images/android-30
-          echo "Checking available SDK packages..."
-          sdkmanager --list || echo "sdkmanager command failed"
-      
-      - name: Start android emulator and run test
-        uses: reactivecircus/android-emulator-runner@v2
-        timeout-minutes: 15
+      - name: 🏁 Run Tests on BrowserStack
         env:
-          ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
-          APPIUM_COMMAND_TIMEOUT: 60000
-          NEW_COMMAND_TIMEOUT: 60000
-        with: 
-          api-level: 30
-          arch: x86_64
-          profile: Nexus 4
-          ram-size: 4096M
-          heap-size: 1024M
-          disk-size: 6G
-          script: |
-            echo "Setting APK permissions"
-            chmod 644 downloaded_apks/*.apk
-
-            echo "Fixing WebDriverIO permissions"
-            chmod +x node_modules/.bin/wdio 
-            
-            echo "Waiting for emulator to fully boot"
-            adb wait-for-device
-            adb shell getprop sys.boot_completed | grep -m 1 "1" || sleep 30
-
-            echo "Checking for ANR before running tests"
-            adb shell dumpsys activity | grep "Application Not Responding" && echo "ANR detected" || echo "No ANR detected"
-
-            echo "Dismissing any ANR popups..."
-            adb shell input keyevent KEYCODE_BACK
-            
-            echo "Restarting System UI to prevent ANRs..."
-            adb shell am force-stop com.android.systemui
-            adb shell am start com.android.systemui/.SystemUIService
-                        
-            echo "Emulator boot completed. Checking devices..."
-            adb devices
-
-            echo "Monitoring system performance"
-            adb shell dumpsys cpuinfo > cpu_info_before_tests.txt
-            adb shell dumpsys meminfo > mem_info_before_tests.txt
-            adb shell top -n 1 -b > top_output_before_tests.txt
-
-            echo "Captured CPU, Memory, and Process info before tests"
-
-            echo "Installing Appium settings APK"
-            adb install downloaded_apks/settings_apk-debug.apk || echo "Failed to install setting apk"
-            echo "Installing UiAutomator2 server APK"
-            adb install downloaded_apks/appium-uiautomator2-server-v7.2.3.apk || echo "Failed to install UiAutomator2 Server"
-            echo "Installing UiAutomator2 server test APK"
-            adb install downloaded_apks/appium-uiautomator2-server-debug-androidTest.apk || echo "Failed to install UiAutomator2 Server Test"
-            
-            echo "Granting necessary permissions"
-            adb shell pm grant io.appium.android.setting android.permission.SETTINGS
-            adb shell pm grant io.appium.android.setting android.permission.WRITE_SECURE_SETTINGS
-            adb shell pm grant io.appium.android.setting android.permission.CHANGE_CONFIGURATION
-            adb shell pm grant io.appium.android.setting android.permission.READ_PHONE_STATE
-            adb shell am broadcast -a io.appium.setting.wifi --es setstatus enable || echo "Failed to enable WiFi"
-
-            adb shell dumpsys meminfo && adb shell top -n 1 -b
-
-            echo "Set Developer options to prevent"
-            adb shell settings put global window_animation_scale 0
-            adb shell settings put global transition_animation_scale 0
-            adb shell settings put global animator_duration_scale 0
-            adb shell settings put global background_process_limit 1
-            adb shell settings put global always_finish_activities 1
-            adb shell settings put global development_settings_enabled 1
-            adb shell settings put global adb_enabled 1
-            adb shell settings put global debug_view_attributes 0
-            adb shell settings put global verifier_verify_adb_installs 0
-            adb shell settings put system power_profile low_power
-            adb shell settings put system screen_off_timeout 1800000
-            adb shell setprop debug.hwui.renderer opengl
-            adb shell setprop debug.hwui.overdraw false
-            adb shell setprop debug.hwui.profile false
-            adb shell am kill-all
-            
-            echo "Starting Appium server"
-            appium --base-path /wd/hub --log appium.log &
-            
-            echo "Waiting for Appium server to start"
-            nc -z localhost 4723 || (eccho "Appium server not started, exiting..." && exit 1)
-            
-            echo "Manually starting UiAutomator2..."
-            adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
-            
-            echo "Creating ANR directory"
-            mkdir -p ./anr-logs
-            
-            echo "Creating bugreport"
-            mkdir -p ./bugreport
-            
-            echo "Creating screenshots directory"
-            mkdir -p ./screenshots
-
-            echo "Creating performance log directory"
-            mkdir -p ./performance-logs
-            
-            echo "Running tests now..."
-            npx wdio wdio.conf.js
-           
-            echo "Capturing ANR logs for debugging"
-            adb shell ls /anr-logs/
-            adb shell cat /anr-logs/anr_*.txt > anr_logs.txt || echo "No ANR logs found"
-
-            echo "Capturing bugreport for debuggin..."
-            adb bugreport > bugreport.zip
-
-      -  name: Upload bugreport
-         uses: actions/upload-artifact@v4
-         if: always()
-         with:
-          name: bugreport
-          path: bugreport.zip
-     
-      -  name: Upload performance logs
-         uses: actions/upload-artifact@v4
-         if: always()
-         with:
-          name: performance-logs
-          path: |
-            ./cpu_info_during_tests.txt
-            ./mem_info_during_tests.txt
-            ./top_output_during_tests.txt
-      
-      - name: Upload ANR logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: anr-logs
-          path: ./anr-logs/
-      
-      - name: Upload Screenshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with: 
-          name: screenshots
-          path: ./screenshots/
-      
-      - name: 📦 Upload Logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-logs
-          path: ./test-log.txt
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: npx wdio wdio.browserstack.conf.js
