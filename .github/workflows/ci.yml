@@ -91,17 +91,25 @@ jobs:
           echo "Checking available SDK packages..."
           sdkmanager --list || echo "sdkmanager command failed"
           
+      - name: Disable animations
+        run: |
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+      
       - name: Start android emulator and run test
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 15
         env:
-          ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 600
+          ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 300
+          APPIUM_COMMAND_TIMEOUT: 60000
+          NEW_COMMAND_TIMEOUT: 60000
         with: 
           api-level: 30
           arch: x86_64
           profile: Nexus 4
-          ram-size: 2048M
-          heap-size: 512M
+          ram-size: 4096M
+          heap-size: 1024M
           disk-size: 6G
           script: |
             echo "Setting APK permissions"
@@ -151,10 +159,7 @@ jobs:
             adb shell dumpsys meminfo && adb shell top -n 1 -b
 
             echo "Set Developer options to prevent"
-            adb shell settings put global window_animation_scale 0
-            adb shell settings put global transition_animation_scale 0
-            adb shell settings put global animator_duration_scale 0
-            adb shell settings put global background_process_limit 2
+            adb shell settings put global background_process_limit 1
             adb shell settings put global always_finish_activities 1
             adb shell settings put global development_settings_enabled 1
             adb shell settings put global adb_enabled 1
@@ -176,8 +181,14 @@ jobs:
             echo "Manually starting UiAutomator2..."
             adb shell am instrument -e debug false -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner
             
+            echo "Creating ANR directory"
+            mkdir -p ./anr-logs
+            
             echo "Creating screenshots directory"
             mkdir -p ./screenshots
+
+            echo "Creating performance log directory"
+            mkdir -p ./performance-logs
             
             echo "Running tests now..."
             npx wdio wdio.conf.js
@@ -187,12 +198,22 @@ jobs:
             adb shell cat /data/anr/anr_*.txt > anr_logs.txt || echo "No ANR logs found"
 
       
+      - name: Upload performance logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-logs
+          path: |
+            ./cpu_info_during_tests.txt
+            ./mem_info_during_tests.txt
+            ./top_output_during_tests.txt
+      
       - name: Upload ANR logs
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: anr-logs
-          path: anr_logs.txt
+          path: ./anr-logs/
       
       - name: Upload Screenshots
         uses: actions/upload-artifact@v4
