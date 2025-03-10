@@ -8,7 +8,7 @@ describe('Basic test', () => {
             await browser.saveScreenshot('./screenshots/screen1.png');  
  
             if (await contentElement.isExisting()) {  
-await contentElement.click();  
+                await contentElement.click();  
                 console.log("Successfully clicked on 'Content' element.");  
             } else {  
                 console.warn("WARNING: 'Content' element not found. Skipping click action.");  
