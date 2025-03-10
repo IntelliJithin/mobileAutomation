@@ -5,6 +5,10 @@ export const config = {
     user : process.env.BROWSERSTACK_USER,
     key : process.env.BROWSERSTACK_KEY,
 
+    hostname : 'hub.browserstack.com',
+    protocol : 'https',
+    port : 443,
+
     specs: [
         // ToDo: define location for spec files here
         './app/android/test/specs/**/*.js'
