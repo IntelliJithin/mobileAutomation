@@ -30,7 +30,15 @@ jobs:
       - name: 🔧 Install Appium & WebDriverIO Dependencies
         run: |
           npm install -g appium
-          appium driver install uiautomator2
+          # Check if uiautomator2 is installed, and update if necessary
+          INSTALLED_DRIVERS=$(appium driver list --installed 2>&1 || echo "Error: Appium command failed")
+          if echo "$INSTALLED_DRIVERS" | grep -q "uiautomator2"; then
+            echo "uiautomator2 is already installed. Updating driver..."
+            appium driver update uiautomator2
+          else
+            echo "uiautomator2 not found. Installing driver..."
+            appium driver install uiautomator2
+          fi
  
       - name: 🔑 Set Up BrowserStack Environment Variables
         run: |
@@ -41,4 +49,4 @@ jobs:
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-        run: npx wdio wdio.browserstack.conf.js
+        run: npx wdio wdio.conf.js
