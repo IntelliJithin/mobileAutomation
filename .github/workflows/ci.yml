@@ -191,8 +191,8 @@ jobs:
             npx wdio wdio.conf.js
            
             echo "Capturing ANR logs for debugging"
-            adb shell ls /data/anr/
-            adb shell cat /data/anr/anr_*.txt > anr_logs.txt || echo "No ANR logs found"
+            adb shell ls /anr-logs/
+            adb shell cat /anr-logs/anr_*.txt > anr_logs.txt || echo "No ANR logs found"
 
       
       - name: Upload performance logs
