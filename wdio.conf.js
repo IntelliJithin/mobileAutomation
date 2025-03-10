@@ -55,9 +55,9 @@ export const config = {
 
     afterTest: async function (test) {
         if (test.passed) {
-            await browser.execute('browserstack_executor: {"action": "setTestStatus", "arguments": { "status": "passed", "reason": "Test passed successfully" }}');
+            await browser.execute('browserstack_executor: {"action": "setSessionStatus", "arguments": { "status": "passed", "reason": "Test passed successfully" }}');
         } else {
-            await browser.execute('browserstack_executor: {"action": "setTestStatus", "arguments": { "status": "failed", "reason": "Test failed" }}');
+            await browser.execute('browserstack_executor: {"action": "setSessionStatus", "arguments": { "status": "failed", "reason": "Test failed" }}');
         }
     }
 
